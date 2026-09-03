@@ -1,9 +1,10 @@
 ---
 name: spec-driven-tdd
-version: 10.0.1-rc1
 description: "Minimal Spec-Driven Test-Driven Development framework for existing products: human-approved spec, independently reviewed RED and GREEN."
-author: GPT-5.6 Sol
 license: MIT
+metadata:
+  version: 10.0.1-rc1
+  author: GPT-5.6 Sol
 ---
 
 ## How to use
@@ -110,6 +111,11 @@ The Reviewer checks that:
 
 The Reviewer may run tests and inspect CI/test artifacts to establish this evidence.
 
+Before issuing the RED review verdict, the Reviewer must provide an
+acceptance-list summary with one row for each acceptance criterion:
+
+`acceptance criterion | how it was reviewed | verdict`
+
 Reviewer returns `PASS`, `FAIL`, `NEEDS_CLARIFICATION`, or `BLOCKED`. On `FAIL`, it gives concrete findings; the Implementer fixes them, commits, reruns RED, and delegates review again.
 
 GREEN is forbidden before `RED_REVIEW: PASS`.
@@ -137,6 +143,12 @@ The Reviewer checks that:
 Reviewer returns `PASS`, `FAIL`, `NEEDS_CLARIFICATION`, or `BLOCKED`. On `FAIL`, the Implementer fixes GREEN, commits, reruns tests, and delegates review again.
 
 The workflow is complete only after `GREEN_REVIEW: PASS` and the Reviewer has explicitly confirmed that the original user task is resolved by the accepted outcome.
+
+## Review acceptance summary
+
+The Reviewer must include the acceptance-list summary before the RED or GREEN
+review verdict. Each row must identify the acceptance criterion, the evidence
+used to review it, and its verdict.
 
 ## Constraints
 
