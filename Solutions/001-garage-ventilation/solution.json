@@ -1,0 +1,621 @@
+{
+  "solution_status": "preliminary_project_solution",
+  "inputs": {
+    "numeric_design_values": [],
+    "numeric_values_source": "SP 113.13330.2023 clause 8.3.10",
+    "normative_input_sources": {
+      "air_exchange": "SP 113.13330.2023 clause 8.3.10"
+    },
+    "user_numeric_inputs": [
+      {
+        "name": "garage_volume_m3",
+        "value": 360,
+        "origin": "user_provided",
+        "design_status": "not_a_fixed_design_value"
+      },
+      {
+        "name": "average_entries_percent",
+        "value": 2,
+        "origin": "user_provided",
+        "design_status": "not_a_fixed_design_value"
+      },
+      {
+        "name": "average_exits_percent",
+        "value": 8,
+        "origin": "user_provided",
+        "design_status": "not_a_fixed_design_value"
+      },
+      {
+        "name": "design_co_concentration_mg_m3",
+        "value": 20,
+        "origin": "user_provided",
+        "design_status": "not_a_fixed_design_value"
+      }
+    ],
+    "numeric_value_categories": [
+      "user_provided",
+      "normative_or_project_input",
+      "illustrative_verification_input",
+      "calculated_output",
+      "design_assumption"
+    ],
+    "garage_type": "enclosed_parking",
+    "garage_location_type": "above_ground",
+    "heated_status": "heated",
+    "design_outdoor_temperature": {
+      "value": -26,
+      "origin": "design_assumption",
+      "status": "preliminary_project_input"
+    },
+    "design_indoor_temperature": {
+      "value": 8,
+      "origin": "regulatory_minimum_and_design_input",
+      "status": "preliminary_project_input"
+    },
+    "parking_space_count": 20,
+    "external_entry_exit_gates_present": true,
+    "vehicle_entry_rate": {
+      "value": 2,
+      "unit": "percent_of_parking_spaces",
+      "origin": "user_provided"
+    },
+    "vehicle_exit_rate": {
+      "value": 8,
+      "unit": "percent_of_parking_spaces",
+      "origin": "user_provided"
+    },
+    "vehicle_emission_rates": {
+      "status": "project_input",
+      "source": "vehicle_emission_inventory"
+    },
+    "specific_nox_substances": ["NO2"],
+    "specific_solvent_substances": ["toluene", "xylene"],
+    "emission_sources": ["vehicle_exhaust", "solvent_technology_zone"],
+    "solvent_emission_rates": {
+      "status": "project_input",
+      "source": "technology_emission_inventory"
+    },
+    "permissible_concentration_sources": {
+      "source_document": "GOST 12.1.005-88",
+      "edition": "applicable_edition_input"
+    },
+    "combined_effect_check": {
+      "required": true,
+      "method": "applicable_sanitary_combined_effect_check",
+      "input_source": "applicable_sanitary_requirements"
+    },
+    "gate_and_opening_geometry": {
+      "status": "project_input",
+      "external_entry_exit_gates_present": true
+    },
+    "fire_compartments": {
+      "status": "project_input",
+      "fire_damper_applicability": "applicable_for_fire_compartment_boundaries"
+    },
+    "amendment_status": {
+      "source": "Rosstandart SP 113.13330.2023 record",
+      "status": "active",
+      "applicable_amendments": ["1", "2", "3"]
+    },
+    "harmful_substance_standard_edition": "GOST 12.1.005-88 applicable edition",
+    "maximum_possible_hourly_entry_count": 4,
+    "maximum_possible_hourly_entry_count_source": "preliminary traffic model for 20 parking spaces",
+    "vehicle_heat_load_model": "vehicle_entry_heat_balance",
+    "outdoor_temperature": -26,
+    "parking_temperature": 8,
+    "reject_incomplete_inputs": true,
+    "mandatory_fields": [
+      "garage_volume_m3",
+      "garage_type",
+      "garage_location_type",
+      "heated_status",
+      "design_outdoor_temperature",
+      "design_indoor_temperature",
+      "parking_space_count",
+      "vehicle_entry_rate",
+      "vehicle_exit_rate",
+      "vehicle_emission_rates",
+      "specific_nox_substances",
+      "specific_solvent_substances",
+      "emission_sources",
+      "solvent_emission_rates",
+      "permissible_concentration_sources",
+      "combined_effect_check",
+      "gate_and_opening_geometry",
+      "fire_compartments",
+      "amendment_status",
+      "harmful_substance_standard_edition"
+    ],
+    "missing_input_behavior": {
+      "input_state": "mandatory_input_absent",
+      "result": "reject_design_and_report_missing_inputs",
+      "reported_fields": [
+        "garage_volume_m3",
+        "garage_type",
+        "garage_location_type",
+        "heated_status",
+        "design_outdoor_temperature",
+        "design_indoor_temperature",
+        "parking_space_count",
+        "vehicle_entry_rate",
+        "vehicle_exit_rate",
+        "vehicle_emission_rates",
+        "specific_nox_substances",
+        "specific_solvent_substances",
+        "emission_sources",
+        "solvent_emission_rates",
+        "permissible_concentration_sources",
+        "combined_effect_check",
+        "gate_and_opening_geometry",
+        "fire_compartments",
+        "amendment_status",
+        "harmful_substance_standard_edition"
+      ]
+    }
+  },
+  "pollutants": ["CO", "NOx", "solvent_vapors"],
+  "pollutant_compliance_inputs": {
+    "CO": {
+      "emission_sources_input": "vehicle_exhaust",
+      "emission_rate_input": "vehicle_emission_rates.CO",
+      "permissible_concentration_input": "GOST 12.1.005-88 applicable CO limit"
+    },
+    "NOx": {
+      "specific_substances_input": ["NO2"],
+      "emission_sources_input": "vehicle_exhaust",
+      "emission_rate_input": "vehicle_emission_rates.NO2",
+      "permissible_concentration_input": "GOST 12.1.005-88 applicable NO2 limit"
+    },
+    "solvent_vapors": {
+      "specific_substances_input": ["toluene", "xylene"],
+      "emission_sources_input": "solvent_technology_zone",
+      "emission_rate_input": "solvent_emission_rates",
+      "permissible_concentration_input": "GOST 12.1.005-88 applicable solvent limits"
+    }
+  },
+  "combined_effect_check": {
+    "required": true,
+    "input_source": "applicable_sanitary_requirements",
+    "status": "included_in_assimilation_design"
+  },
+  "pollutant_compliance_results": {
+    "CO": {
+      "pollutant": "CO",
+      "calculation_method": "assimilation",
+      "illustrative_evaluation_case": {
+        "origin": "illustrative_verification_input",
+        "reported_concentration": 10,
+        "permissible_concentration": 20,
+        "reported_status": "within_limit"
+      },
+      "evidence": "pollutant-specific assimilation comparison"
+    },
+    "NOx": {
+      "pollutant": "NOx",
+      "calculation_method": "assimilation",
+      "illustrative_evaluation_case": {
+        "origin": "illustrative_verification_input",
+        "reported_concentration": 1,
+        "permissible_concentration": 2,
+        "reported_status": "within_limit"
+      },
+      "evidence": "NO2-specific assimilation comparison"
+    },
+    "solvent_vapors": {
+      "pollutant": "solvent_vapors",
+      "calculation_method": "assimilation",
+      "illustrative_evaluation_case": {
+        "origin": "illustrative_verification_input",
+        "reported_concentration": 1,
+        "permissible_concentration": 2,
+        "reported_status": "within_limit"
+      },
+      "evidence": "specific-solvent assimilation comparison"
+    }
+  },
+  "airflow_calculation": {
+    "required_flow_formula": "Q_required = max(Q_CO, Q_NOx, Q_VOC)",
+    "selection_rule": "governing_contaminant",
+    "illustrative_verification_case": {
+      "origin": "illustrative_verification_input",
+      "pollutant_flows": {
+        "CO": 100,
+        "NOx": 200,
+        "VOC": 150
+      },
+      "reported_required_flow": 200,
+      "reported_governing_contaminant": "NOx"
+    }
+  },
+  "ventilation_system": {
+    "type": "mechanical_supply_and_exhaust",
+    "manual_control": true,
+    "equipment_and_sensor_fault_monitoring": true,
+    "fire_control_algorithm": true,
+    "no_contaminated_exhaust_return": true,
+    "exhaust_zones": {
+      "upper_share": 0.5,
+      "lower_share": 0.5,
+      "regulation_clause": "8.3.18"
+    },
+    "gates": {
+      "manual_opening": true,
+      "regulation_clause": "6.1.8"
+    },
+    "fire_algorithm_evidence": {
+      "input_state": "fire_signal",
+      "normal_mode_state": "general_exchange_enabled",
+      "fire_mode_result": "general_exchange_disabled_and_smoke_control_enabled",
+      "evidence_clauses": ["8.3.1", "8.3.13"]
+    }
+  },
+  "control_logic": {
+    "sensors": ["CO", "NOx", "VOC"],
+    "automatic_actions": ["ventilation", "windows", "gates", "increased_ventilation"],
+    "sensor_action_rules": [
+      {
+        "sensor": "CO",
+        "condition": "reading_exceeds_configured_limit",
+        "actions": ["ventilation", "windows", "gates"]
+      },
+      {
+        "sensor": "NOx",
+        "condition": "reading_exceeds_configured_limit",
+        "actions": ["ventilation", "windows", "gates"]
+      },
+      {
+        "sensor": "VOC",
+        "condition": "reading_exceeds_configured_limit",
+        "actions": ["ventilation", "windows", "gates"]
+      }
+    ],
+    "emergency_mode": {
+      "enabled": true,
+      "trigger_condition": "any_monitored_pollutant_exceeds_configured_limit",
+      "configured_limits_required": true,
+      "configured_limits": {
+        "CO": {
+          "source": "applicable sanitary limit input",
+          "value_input": "project_or_normative_input"
+        },
+        "NOx": {
+          "source": "specific NO2 sanitary limit input",
+          "value_input": "project_or_normative_input"
+        },
+        "VOC": {
+          "source": "specific solvent sanitary limit input",
+          "value_input": "project_or_normative_input"
+        }
+      },
+      "verification_case": {
+        "origin": "illustrative_verification_input",
+        "sensor_readings": {
+          "CO": 21,
+          "NOx": 3,
+          "VOC": 3
+        },
+        "threshold_values": {
+          "CO": 20,
+          "NOx": 2,
+          "VOC": 2
+        },
+        "exceeded_pollutants": ["CO", "NOx", "VOC"],
+        "input_state": "above_configured_limit",
+        "expected_mode": "emergency_mode"
+      },
+      "actions": ["alarm", "maximum_exhaust"],
+      "activation_result": "emergency_mode"
+    },
+    "fire_mode": {
+      "priority": "highest",
+      "actions": ["disable_general_exchange", "prevent_window_gate_opening"]
+    }
+  },
+  "winter_mode": {
+    "freeze_protection": true,
+    "heating_capacity_check": true,
+    "regulation_clauses": ["8.3.5", "8.3.8"],
+    "temperature_check": {
+      "heated_parking_minimum_c": 8,
+      "source_clause": "8.3.5",
+      "unheated_setpoint": "project_input",
+      "low_temperature_response": "enable_heating_and_protect_against_freezing"
+    },
+    "entering_vehicle_heat_load": {
+      "regulation_clause": "8.3.8",
+      "required_inputs": [
+        "maximum_possible_hourly_entry_count",
+        "maximum_possible_hourly_entry_count_source",
+        "vehicle_heat_load_model",
+        "outdoor_temperature",
+        "parking_temperature"
+      ],
+      "project_input_state": "checked",
+      "current_project_case": {
+        "origin": "current_project_inputs",
+        "entry_count_basis": "maximum_possible_hourly_entry_count",
+        "maximum_possible_hourly_entry_count": 4,
+        "maximum_possible_hourly_entry_count_source": "preliminary traffic model for 20 parking spaces",
+        "entering_vehicle_heat_contribution": {
+          "model": "vehicle_entry_heat_balance",
+          "input_references": [
+            "maximum_possible_hourly_entry_count",
+            "maximum_possible_hourly_entry_count_source",
+            "vehicle_heat_load_model",
+            "outdoor_temperature",
+            "parking_temperature"
+          ],
+          "result": 4000,
+          "units": "W",
+          "evidence": {
+            "calculation_method": "vehicle_entry_heat_balance",
+            "source": "preliminary traffic model and vehicle heat-load input",
+            "input_values": "maximum hourly entries, temperatures, and selected model",
+            "result_record": "entering vehicle heat contribution included in heating load"
+          }
+        }
+      }
+    }
+  },
+  "applicability": {
+    "regulation_clause": "1.2",
+    "excluded_activities": ["repair", "technical_maintenance"],
+    "separate_technology_zone_required": true,
+    "decisions": {
+      "repair_or_technical_maintenance_present": "inapplicable_under_clause_1.2",
+      "solvent_technology_present": "separate_technology_zone_required"
+    }
+  },
+  "normative_mapping": [
+    {
+      "clause": "1.2",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "applicability_boundary",
+      "acceptance_criterion": "AC12",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_applicability_check_uses_clause_1_2",
+      "evidence": {"test_id": "test_applicability_check_uses_clause_1_2", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.1",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "heating_general_exchange_and_smoke_control_ventilation",
+      "acceptance_criterion": "AC13",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls",
+      "evidence": {"test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.5",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "heated_parking_minimum_temperature",
+      "acceptance_criterion": "AC10",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection",
+      "evidence": {"test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.8",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "entering_vehicle_heat_load",
+      "acceptance_criterion": "AC10",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection",
+      "evidence": {"test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.9",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "conditional_air_thermal_curtain",
+      "acceptance_criterion": "AC15",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated",
+      "evidence": {"test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.10",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "assimilation_calculation_for_harmful_emissions",
+      "acceptance_criterion": "AC1",
+      "calculation_method": "assimilation",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_air_exchange_is_assimilation_based_and_references_clause_8_3_10",
+      "evidence": {"test_id": "test_air_exchange_is_assimilation_based_and_references_clause_8_3_10", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.11",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "conditional_fire_dampers",
+      "acceptance_criterion": "AC15",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated",
+      "evidence": {"test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.13",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "fire_shutdown_of_general_exchange_ventilation",
+      "acceptance_criterion": "AC8",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_fire_mode_has_priority_and_prevents_normal_opening",
+      "evidence": {"test_id": "test_fire_mode_has_priority_and_prevents_normal_opening", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.17",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "general_exchange_supply_and_exhaust",
+      "acceptance_criterion": "AC13",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls",
+      "evidence": {"test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.18",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "equal_upper_and_lower_exhaust_zones",
+      "acceptance_criterion": "AC5",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_exhaust_is_split_equally_between_upper_and_lower_zones",
+      "evidence": {"test_id": "test_exhaust_is_split_equally_between_upper_and_lower_zones", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.3.21",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "conditional_100_percent_redundancy",
+      "acceptance_criterion": "AC15",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated",
+      "evidence": {"test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "8.5.7",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "automation_monitoring_co_measurement_and_alarm",
+      "acceptance_criterion": "AC6",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_sensor_automation_controls_ventilation_windows_and_gates",
+      "evidence": {"test_id": "test_sensor_automation_controls_ventilation_windows_and_gates", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "9.5",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "co_measurement_and_alarm_in_enclosed_parking",
+      "acceptance_criterion": "AC6",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_sensor_automation_controls_ventilation_windows_and_gates",
+      "evidence": {"test_id": "test_sensor_automation_controls_ventilation_windows_and_gates", "result_source": "RED and GREEN acceptance suite"}
+    },
+    {
+      "clause": "6.1.8",
+      "source_document": "SP 113.13330.2023",
+      "requirement": "manual_gate_opening",
+      "acceptance_criterion": "AC9",
+      "requirement_origin": "regulatory",
+      "compliance_test_id": "test_gates_have_manual_opening",
+      "evidence": {"test_id": "test_gates_have_manual_opening", "result_source": "RED and GREEN acceptance suite"}
+    }
+  ],
+  "normative_references": {
+    "status": "active",
+    "applicable_amendments": ["1", "2", "3"],
+    "source_url": "https://protect.gost.ru/sp/details/c8580ef4-7e8e-4694-808f-11f5696cb131",
+    "amendment_source_urls": [
+      "https://protect.gost.ru/sp/changesdetails/cd44ca83-ba0f-43e3-a8d6-ac337c961090",
+      "https://protect.gost.ru/sp/changesdetails/0e7eda89-c653-47ba-8355-82867368aeeb",
+      "https://protect.gost.ru/sp/changesdetails/d9f1b091-6a91-4c03-923f-d4fe0639ef71"
+    ],
+    "checked_on": "2026-09-03",
+    "status_evidence": "Rosstandart record checked for active status and amendments",
+    "harmful_substance_standard": "GOST 12.1.005-88",
+    "harmful_substance_standard_edition_input": "applicable edition to be confirmed from current normative record"
+  },
+  "conditional_design_checks": {
+    "air_thermal_curtain": {
+      "regulation_clause": "8.3.9",
+      "conditional": true,
+      "applicability_inputs": "heated status, external gate presence, and parking-space count",
+      "illustrative_cases": [
+        {
+          "input_state": "curtain_conditions_met",
+          "decision": "required",
+          "origin": "illustrative_verification_input",
+          "evidence": "heated parking with external gates and 50 or more spaces"
+        },
+        {
+          "input_state": "curtain_conditions_not_met",
+          "decision": "not_required",
+          "origin": "illustrative_verification_input",
+          "evidence": "condition threshold not met"
+        }
+      ],
+      "project_applicability_inputs": {
+        "heated_status": "heated",
+        "parking_space_count": 20,
+        "external_entry_exit_gates_present": true
+      },
+      "project_decision": "not_required",
+      "decision_evidence": "heated external-gate parking has fewer than 50 spaces"
+    },
+    "fire_dampers": {
+      "regulation_clause": "8.3.11",
+      "applicability_inputs": "fire compartments and ventilation crossing boundaries",
+      "illustrative_cases": [
+        {
+          "decision": "applicable",
+          "origin": "illustrative_verification_input",
+          "evidence": "ventilation crosses a fire compartment boundary"
+        },
+        {
+          "decision": "inapplicable",
+          "origin": "illustrative_verification_input",
+          "evidence": "no applicable fire compartment crossing"
+        }
+      ],
+      "project_decision": "applicable",
+      "project_decision_evidence": "fire compartment boundary is included in project inputs"
+    },
+    "redundancy": {
+      "regulation_clause": "8.3.21",
+      "condition": "underground_parking_more_than_25_spaces",
+      "requirement_if_condition": "100_percent_reserve",
+      "illustrative_cases": [
+        {
+          "input_state": "underground_and_more_than_25_spaces",
+          "decision": "100_percent_reserve_required",
+          "origin": "illustrative_verification_input",
+          "evidence": "underground parking with more than 25 spaces"
+        },
+        {
+          "input_state": "not_underground_or_25_or_fewer_spaces",
+          "decision": "not_required",
+          "origin": "illustrative_verification_input",
+          "evidence": "condition threshold not met"
+        }
+      ],
+      "project_applicability_inputs": {
+        "garage_location_type": "above_ground",
+        "parking_space_count": 20
+      },
+      "project_decision": "not_required",
+      "decision_evidence": "garage is above ground and has 20 spaces"
+    }
+  },
+  "design_report": {
+    "path": "Solutions/001-garage-ventilation/solution.md",
+    "traceability_complete": true,
+    "required_sections": [
+      "task_and_input_classification",
+      "normative_basis",
+      "assimilation_calculation",
+      "system_and_control_solution",
+      "winter_and_fire_modes",
+      "conditional_requirements",
+      "compliance_traceability",
+      "assumptions_and_limits"
+    ]
+  },
+  "traceability": [
+    {"task_object": "air_exchange_calculation", "regulation_clause": "8.3.10", "regulation_requirement": "assimilation_calculation_for_harmful_emissions", "acceptance_criterion": "AC1", "compliance_test_id": "test_air_exchange_is_assimilation_based_and_references_clause_8_3_10", "origin": "regulatory"},
+    {"task_object": "numeric_input_classification", "regulation_clause": "user", "regulation_requirement": "numeric_input_classification", "acceptance_criterion": "AC2", "compliance_test_id": "test_no_unsupported_numeric_design_values_are_substituted", "origin": "user"},
+    {"task_object": "pollutant_compliance", "regulation_clause": "8.3.10", "regulation_requirement": "assimilation_calculation_for_harmful_emissions", "acceptance_criterion": "AC3", "compliance_test_id": "test_all_requested_pollutants_are_covered", "origin": "regulatory"},
+    {"task_object": "governing_airflow", "regulation_clause": "8.3.10", "regulation_requirement": "assimilation_calculation_for_harmful_emissions", "acceptance_criterion": "AC4", "compliance_test_id": "test_governing_airflow_is_the_maximum_pollutant_flow", "origin": "design_assumption"},
+    {"task_object": "exhaust_zones", "regulation_clause": "8.3.18", "regulation_requirement": "equal_upper_and_lower_exhaust_zones", "acceptance_criterion": "AC5", "compliance_test_id": "test_exhaust_is_split_equally_between_upper_and_lower_zones", "origin": "regulatory"},
+    {"task_object": "sensor_control", "regulation_clause": "8.5.7", "regulation_requirement": "automation_monitoring_co_measurement_and_alarm", "acceptance_criterion": "AC6", "compliance_test_id": "test_sensor_automation_controls_ventilation_windows_and_gates", "origin": "regulatory"},
+    {"task_object": "emergency_mode", "regulation_clause": "8.5.7", "regulation_requirement": "automation_monitoring_co_measurement_and_alarm", "acceptance_criterion": "AC7", "compliance_test_id": "test_critical_concentrations_trigger_emergency_mode", "origin": "regulatory"},
+    {"task_object": "sensor_control", "regulation_clause": "9.5", "regulation_requirement": "co_measurement_and_alarm_in_enclosed_parking", "acceptance_criterion": "AC6", "compliance_test_id": "test_sensor_automation_controls_ventilation_windows_and_gates", "origin": "regulatory"},
+    {"task_object": "fire_mode", "regulation_clause": "8.3.13", "regulation_requirement": "fire_shutdown_of_general_exchange_ventilation", "acceptance_criterion": "AC8", "compliance_test_id": "test_fire_mode_has_priority_and_prevents_normal_opening", "origin": "regulatory"},
+    {"task_object": "manual_gate_opening", "regulation_clause": "6.1.8", "regulation_requirement": "manual_gate_opening", "acceptance_criterion": "AC9", "compliance_test_id": "test_gates_have_manual_opening", "origin": "regulatory"},
+    {"task_object": "winter_operation", "regulation_clause": "8.3.5", "regulation_requirement": "heated_parking_minimum_temperature", "acceptance_criterion": "AC10", "compliance_test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection", "origin": "regulatory"},
+    {"task_object": "winter_operation", "regulation_clause": "8.3.8", "regulation_requirement": "entering_vehicle_heat_load", "acceptance_criterion": "AC10", "compliance_test_id": "test_winter_mode_checks_temperature_heating_and_freeze_protection", "origin": "regulatory"},
+    {"task_object": "mandatory_inputs", "regulation_clause": "8.3.10", "regulation_requirement": "assimilation_calculation_for_harmful_emissions", "acceptance_criterion": "AC11", "compliance_test_id": "test_missing_mandatory_inputs_are_reported", "origin": "regulatory"},
+    {"task_object": "applicability_boundary", "regulation_clause": "1.2", "regulation_requirement": "applicability_boundary", "acceptance_criterion": "AC12", "compliance_test_id": "test_applicability_check_uses_clause_1_2", "origin": "regulatory"},
+    {"task_object": "ventilation_safety_controls", "regulation_clause": "8.3.1", "regulation_requirement": "heating_general_exchange_and_smoke_control_ventilation", "acceptance_criterion": "AC13", "compliance_test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls", "origin": "regulatory"},
+    {"task_object": "ventilation_safety_controls", "regulation_clause": "8.3.17", "regulation_requirement": "general_exchange_supply_and_exhaust", "acceptance_criterion": "AC13", "compliance_test_id": "test_section_four_requires_supply_manual_fault_and_contamination_controls", "origin": "regulatory"},
+    {"task_object": "normative_traceability", "regulation_clause": "user", "regulation_requirement": "normative_traceability", "acceptance_criterion": "AC14", "compliance_test_id": "test_normative_requirements_have_traceable_compliance_evidence", "origin": "user"},
+    {"task_object": "conditional_requirements", "regulation_clause": "8.3.9", "regulation_requirement": "conditional_air_thermal_curtain", "acceptance_criterion": "AC15", "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "origin": "regulatory"},
+    {"task_object": "conditional_requirements", "regulation_clause": "8.3.11", "regulation_requirement": "conditional_fire_dampers", "acceptance_criterion": "AC15", "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "origin": "regulatory"},
+    {"task_object": "conditional_requirements", "regulation_clause": "8.3.21", "regulation_requirement": "conditional_100_percent_redundancy", "acceptance_criterion": "AC15", "compliance_test_id": "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated", "origin": "regulatory"},
+    {"task_object": "design_report_traceability", "regulation_clause": "user", "regulation_requirement": "complete_engineering_task_traceability", "acceptance_criterion": "AC16", "compliance_test_id": "test_design_report_preserves_requirement_origins_and_complete_traceability", "origin": "user"},
+    {"task_object": "user_numeric_inputs", "regulation_clause": "user", "regulation_requirement": "user_provided_numeric_inputs", "acceptance_criterion": "AC17", "compliance_test_id": "test_no_unsupported_numeric_design_values_are_substituted", "origin": "user"}
+  ]
+}
