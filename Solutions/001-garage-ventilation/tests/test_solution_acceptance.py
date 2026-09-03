@@ -95,6 +95,16 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertEqual(user_inputs[name]["value"], value)
             self.assertEqual(user_inputs[name]["origin"], "user_provided")
             self.assertEqual(user_inputs[name]["design_status"], "not_a_fixed_design_value")
+        categories = inputs["numeric_value_categories"]
+        self.assertTrue(
+            {
+                "user_provided",
+                "normative_or_project_input",
+                "illustrative_verification_input",
+                "calculated_output",
+                "design_assumption",
+            }.issubset(categories)
+        )
 
     def test_all_requested_pollutants_are_covered(self):
         solution = load_solution()
@@ -259,6 +269,9 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertEqual(mapping[clause]["source_document"], "SP 113.13330.2023")
             self.assertTrue(mapping[clause]["compliance_test_id"])
             self.assertEqual(mapping[clause]["requirement_origin"], "regulatory")
+            self.assertTrue(mapping[clause]["requirement"])
+            self.assertTrue(mapping[clause]["acceptance_criterion"])
+            self.assertTrue(mapping[clause]["evidence"])
         references = solution["normative_references"]
         self.assertTrue(references["amendment_status_check"])
         self.assertEqual(references["harmful_substance_standard"], "GOST 12.1.005-88")
@@ -294,6 +307,9 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         origins = {item["origin"] for item in traceability}
         self.assertTrue({"regulatory", "user", "design_assumption"}.issubset(origins))
         for item in traceability:
+            self.assertTrue(item["task_object"])
+            self.assertTrue(item["regulation_requirement"])
+            self.assertTrue(item["acceptance_criterion"])
             self.assertTrue(item["compliance_test_id"])
 
 
