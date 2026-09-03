@@ -68,7 +68,7 @@ EXPECTED_TRACEABILITY = {
     ("exhaust_zones", "8.3.18", "equal_upper_and_lower_exhaust_zones", "AC5", "test_exhaust_is_split_equally_between_upper_and_lower_zones"),
     ("sensor_control", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
     ("emergency_mode", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
-    ("emergency_mode", "9.5", "co_measurement_and_alarm_in_enclosed_parking", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
+    ("sensor_control", "9.5", "co_measurement_and_alarm_in_enclosed_parking", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
     ("fire_mode", "8.3.13", "fire_shutdown_of_general_exchange_ventilation", "AC8", "test_fire_mode_has_priority_and_prevents_normal_opening"),
     ("manual_gate_opening", "6.1.8", "manual_gate_opening", "AC9", "test_gates_have_manual_opening"),
     ("winter_operation", "8.3.5", "heated_parking_minimum_temperature", "AC10", "test_winter_mode_checks_temperature_heating_and_freeze_protection"),
