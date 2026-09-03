@@ -32,8 +32,16 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
 
     def test_no_unsupported_numeric_design_values_are_substituted(self):
         solution = load_solution()
-        self.assertEqual(solution["inputs"]["numeric_design_values"], [])
-        self.assertTrue(solution["inputs"]["numeric_values_source"])
+        inputs = solution["inputs"]
+        self.assertEqual(inputs["numeric_design_values"], [])
+        self.assertEqual(
+            inputs["numeric_values_source"],
+            "SP 113.13330.2023 clause 8.3.10",
+        )
+        self.assertEqual(
+            inputs["normative_input_sources"]["air_exchange"],
+            "SP 113.13330.2023 clause 8.3.10",
+        )
 
     def test_all_requested_pollutants_are_covered(self):
         solution = load_solution()
@@ -61,16 +69,26 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         solution = load_solution()
         control = solution["control_logic"]
         self.assertEqual(set(control["sensors"]), {"CO", "NOx", "VOC"})
-        self.assertIn("ventilation", control["automatic_actions"])
-        self.assertIn("windows", control["automatic_actions"])
-        self.assertIn("gates", control["automatic_actions"])
+        required_actions = {"ventilation", "windows", "gates"}
+        self.assertTrue(required_actions.issubset(control["automatic_actions"]))
+        rules = control["sensor_action_rules"]
+        self.assertEqual({rule["sensor"] for rule in rules}, {"CO", "NOx", "VOC"})
+        for rule in rules:
+            self.assertEqual(rule["condition"], "reading_exceeds_configured_limit")
+            self.assertTrue(required_actions.issubset(rule["actions"]))
 
     def test_critical_concentrations_trigger_emergency_mode(self):
         solution = load_solution()
         emergency = solution["control_logic"]["emergency_mode"]
         self.assertTrue(emergency["enabled"])
+        self.assertEqual(
+            emergency["trigger_condition"],
+            "any_monitored_pollutant_exceeds_configured_limit",
+        )
+        self.assertTrue(emergency["configured_limits_required"])
         self.assertIn("alarm", emergency["actions"])
         self.assertIn("maximum_exhaust", emergency["actions"])
+        self.assertEqual(emergency["activation_result"], "emergency_mode")
 
     def test_fire_mode_has_priority_and_prevents_normal_opening(self):
         solution = load_solution()
@@ -93,6 +111,14 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertTrue(winter["heating_capacity_check"])
         self.assertIn("8.3.5", winter["regulation_clauses"])
         self.assertIn("8.3.8", winter["regulation_clauses"])
+        temperature_check = winter["temperature_check"]
+        self.assertEqual(temperature_check["heated_parking_minimum_c"], 8)
+        self.assertEqual(temperature_check["source_clause"], "8.3.5")
+        self.assertEqual(temperature_check["unheated_setpoint"], "project_input")
+        self.assertEqual(
+            temperature_check["low_temperature_response"],
+            "enable_heating_and_protect_against_freezing",
+        )
 
     def test_missing_mandatory_inputs_are_reported(self):
         solution = load_solution()
@@ -100,6 +126,16 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertTrue(inputs["reject_incomplete_inputs"])
         self.assertIn("garage_type", inputs["mandatory_fields"])
         self.assertIn("solvent_emission_rates", inputs["mandatory_fields"])
+        missing_input = inputs["missing_input_behavior"]
+        self.assertEqual(missing_input["input_state"], "mandatory_input_absent")
+        self.assertEqual(
+            missing_input["result"],
+            "reject_design_and_report_missing_inputs",
+        )
+        self.assertEqual(
+            set(missing_input["reported_fields"]),
+            set(inputs["mandatory_fields"]),
+        )
 
     def test_applicability_check_uses_clause_1_2(self):
         solution = load_solution()
@@ -108,8 +144,11 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertIn("repair", applicability["excluded_activities"])
         self.assertIn("technical_maintenance", applicability["excluded_activities"])
         self.assertTrue(applicability["separate_technology_zone_required"])
+        self.assertEqual(
+            applicability["decisions"]["repair_or_technical_maintenance_present"],
+            "inapplicable_under_clause_1.2",
+        )
 
 
 if __name__ == "__main__":
     unittest.main()
-
