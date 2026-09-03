@@ -307,6 +307,8 @@ def available_mandatory_inputs(inputs):
     def present(value):
         if value in (None, "", {}):
             return False
+        if isinstance(value, (list, tuple, set)) and not value:
+            return False
         if isinstance(value, dict) and "value" in value:
             return value["value"] not in (None, "", {})
         return True
@@ -682,6 +684,10 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertEqual(
             set(missing_input["reported_fields"]), expected_missing
         )
+        empty_list_probe = dict(inputs)
+        empty_list_probe["specific_nox_substances"] = []
+        probe_available = available_mandatory_inputs(empty_list_probe)
+        self.assertNotIn("specific_nox_substances", probe_available)
 
     def test_applicability_check_uses_clause_1_2(self):
         solution = load_solution()
