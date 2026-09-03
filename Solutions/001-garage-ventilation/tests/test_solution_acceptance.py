@@ -89,13 +89,7 @@ EXPECTED_TRACEABILITY = {
 }
 
 EXPECTED_TRACEABILITY_ORIGINS = {
-    row: (
-        "design_assumption"
-        if row[0] == "governing_airflow"
-        else "user"
-        if row[1] == "user"
-        else "regulatory"
-    )
+    row: "user" if row[1] == "user" else "regulatory"
     for row in EXPECTED_TRACEABILITY
 }
 
@@ -154,11 +148,22 @@ EXPECTED_NUMERIC_CONTEXTS = {
     "/winter_mode/temperature_check/heated_parking_minimum_c": ("normative_or_project_input", "normative_or_project_input", 8),
 }
 
-DESIGN_ASSUMPTION_NUMERIC_PATHS = {
+PROJECT_INPUT_NUMERIC_PATHS = {
     "/inputs/parking_space_count/value",
     "/inputs/maximum_possible_hourly_entry_count/value",
     "/inputs/outdoor_temperature/value",
     "/inputs/parking_temperature/value",
+}
+
+TRACEABLE_PROJECT_ORIGINS = {
+    "user_provided",
+    "normative_or_project_input",
+    "illustrative_verification_input",
+    "design_assumption",
+}
+TRACEABLE_PROJECT_STATUSES = {
+    "current_project_input",
+    "conditional_assumption",
 }
 
 EXPECTED_CLAUSE_TESTS = {
@@ -225,31 +230,25 @@ ENTERING_VEHICLE_HEAT_PROJECT_INPUTS = {
 def available_project_inputs(inputs, required_names):
     """Return project inputs that are present and have a usable value."""
     def usable(value):
-        if value in (None, "", {}):
+        if not isinstance(value, dict):
             return False
-        if isinstance(value, dict):
-            if not {
-                "value",
-                "origin",
-                "source",
-                "status",
-            }.issubset(value):
-                return False
-            if value["origin"] not in {
-                "user_provided",
-                "normative_or_project_input",
-                "illustrative_verification_input",
-                "design_assumption",
-            }:
-                return False
-            if not value["source"] or value["status"] not in {
-                "current_project_input",
-                "conditional_assumption",
-            }:
-                return False
-        elif isinstance(value, str):
-            return value not in {"project_input", "applicable_edition_input"}
-        return True
+        if not {"value", "origin", "source", "status"}.issubset(value):
+            return False
+        if value["value"] in (None, "", {}):
+            return False
+        if value["origin"] not in TRACEABLE_PROJECT_ORIGINS:
+            return False
+        if not isinstance(value["source"], str) or not value["source"].strip():
+            return False
+        if value["status"] not in TRACEABLE_PROJECT_STATUSES:
+            return False
+        if value["origin"] == "design_assumption":
+            return (
+                value["status"] == "conditional_assumption"
+                and isinstance(value.get("scenario_intent"), str)
+                and bool(value["scenario_intent"].strip())
+            )
+        return value["status"] == "current_project_input"
 
     return {
         name: inputs[name]
@@ -293,8 +292,26 @@ def contains_design_assumption(records):
     )
 
 
+def assert_assumption_intent(test_case, record, marker):
+    if record.get("origin") == "design_assumption":
+        test_case.assertEqual(record["status"], "conditional_assumption")
+        test_case.assertIn(marker, record["scenario_intent"])
+
+
 def available_mandatory_inputs(inputs):
-    available = available_project_inputs(inputs, EXPECTED_MANDATORY_INPUTS)
+    placeholder_fields = {
+        "vehicle_emission_rates",
+        "solvent_emission_rates",
+        "gate_and_opening_geometry",
+        "fire_compartments",
+    }
+    available = {
+        name: inputs[name]
+        for name in EXPECTED_MANDATORY_INPUTS
+        if name in inputs
+        and name not in placeholder_fields
+        and inputs[name] not in (None, "", {})
+    }
     user_names = {
         item["name"]
         for item in inputs.get("user_numeric_inputs", [])
@@ -361,7 +378,7 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         }
         self.assertEqual(set(registry), set(values))
         self.assertTrue(set(values).issubset(
-            set(EXPECTED_NUMERIC_CONTEXTS) | DESIGN_ASSUMPTION_NUMERIC_PATHS
+            set(EXPECTED_NUMERIC_CONTEXTS) | PROJECT_INPUT_NUMERIC_PATHS
         ))
         for pointer, value in values.items():
             entry = registry[pointer]
@@ -374,16 +391,23 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 self.assertEqual(entry["origin"], expected_origin)
                 self.assertEqual(entry["classification"], expected_classification)
             else:
-                self.assertIn(pointer, DESIGN_ASSUMPTION_NUMERIC_PATHS)
+                self.assertIn(pointer, PROJECT_INPUT_NUMERIC_PATHS)
                 record = json_pointer_value(
                     solution, pointer.rsplit("/", 1)[0]
                 )
                 self.assertIsInstance(record, dict)
-                self.assertEqual(record["origin"], "design_assumption")
-                self.assertEqual(record["status"], "conditional_assumption")
+                self.assertIn(record["origin"], TRACEABLE_PROJECT_ORIGINS)
                 self.assertTrue(record["source"])
-                self.assertEqual(entry["origin"], "design_assumption")
-                self.assertEqual(entry["classification"], "design_assumption")
+                self.assertIn(record["status"], TRACEABLE_PROJECT_STATUSES)
+                if record["origin"] == "design_assumption":
+                    self.assertEqual(record["status"], "conditional_assumption")
+                    self.assertTrue(record.get("scenario_intent"))
+                    expected_classification = "design_assumption"
+                else:
+                    self.assertEqual(record["status"], "current_project_input")
+                    expected_classification = "normative_or_project_input"
+                self.assertEqual(entry["origin"], record["origin"])
+                self.assertEqual(entry["classification"], expected_classification)
 
     def test_all_requested_pollutants_are_covered(self):
         solution = load_solution()
@@ -578,8 +602,30 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             )
         else:
             self.assertEqual(entering_vehicle["project_input_state"], "checked")
+            assumption_markers = {
+                "maximum_possible_hourly_entry_count": "maximum_hourly_entries",
+                "maximum_possible_hourly_entry_count_source": "maximum_hourly_entries",
+                "vehicle_heat_load_model": "vehicle_heat_model",
+                "outdoor_temperature": "temperature",
+                "parking_temperature": "temperature",
+            }
+            for name, marker in assumption_markers.items():
+                assert_assumption_intent(
+                    self, inputs[name], marker
+                )
             heat_case = entering_vehicle["current_project_case"]
-            self.assertEqual(heat_case["origin"], "current_project_inputs")
+            has_assumption = contains_design_assumption(
+                {
+                    name: inputs[name]
+                    for name in ENTERING_VEHICLE_HEAT_PROJECT_INPUTS
+                }
+            )
+            expected_heat_origin = (
+                "conditional_design_assumption"
+                if has_assumption
+                else "current_project_inputs"
+            )
+            self.assertEqual(heat_case["origin"], expected_heat_origin)
             self.assertEqual(
                 heat_case["entry_count_basis"],
                 "maximum_possible_hourly_entry_count",
@@ -612,14 +658,6 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertTrue(evidence["source"])
             self.assertTrue(evidence["input_values"])
             self.assertTrue(evidence["result_record"])
-            if any(
-                isinstance(inputs.get(name), dict)
-                and inputs[name].get("origin") == "design_assumption"
-                for name in ENTERING_VEHICLE_HEAT_PROJECT_INPUTS
-            ):
-                self.assertIn(
-                    heat_case["origin"], {"conditional_design_assumption"}
-                )
         self.assertEqual(entering_vehicle["regulation_clause"], "8.3.8")
 
     def test_missing_mandatory_inputs_are_reported(self):
@@ -744,6 +782,14 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 else "not_required"
             )
             self.assertEqual(gate["project_decision"], expected_gate_decision)
+            for record in gate_project_inputs.values():
+                assert_assumption_intent(self, record, "air_thermal_curtain")
+            parking_record = gate_project_inputs["parking_space_count"]
+            if parking_record["origin"] == "design_assumption":
+                if expected_gate_decision == "required":
+                    self.assertGreaterEqual(spaces, 50)
+                else:
+                    self.assertLess(spaces, 50)
             if contains_design_assumption(gate_project_inputs):
                 self.assertIn("conditional", gate["decision_evidence"])
 
@@ -777,6 +823,8 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 else "inapplicable"
             )
             self.assertEqual(dampers["project_decision"], expected_damper_decision)
+            for record in damper_project_inputs.values():
+                assert_assumption_intent(self, record, "fire_damper")
             if contains_design_assumption(damper_project_inputs):
                 self.assertIn("conditional", dampers["project_decision_evidence"])
         self.assertEqual(dampers["regulation_clause"], "8.3.11")
@@ -828,6 +876,14 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertEqual(
                 redundancy["project_decision"], expected_redundancy_decision
             )
+            for record in redundancy_project_inputs.values():
+                assert_assumption_intent(self, record, "redundancy")
+            parking_record = redundancy_project_inputs["parking_space_count"]
+            if parking_record["origin"] == "design_assumption":
+                if expected_redundancy_decision == "100_percent_reserve_required":
+                    self.assertGreater(spaces, 25)
+                else:
+                    self.assertLessEqual(spaces, 25)
             if contains_design_assumption(redundancy_project_inputs):
                 self.assertIn("conditional", redundancy["decision_evidence"])
 
@@ -837,10 +893,24 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertEqual(report["path"], "Solutions/001-garage-ventilation/solution.md")
         self.assertTrue(report["traceability_complete"])
         self.assertTrue(report["required_sections"])
+        report_path = Path(__file__).parents[3] / report["path"]
+        self.assertTrue(report_path.is_file())
+        report_text = report_path.read_text(encoding="utf-8").lower()
+        for required_text in (
+            "360 m3",
+            "8.3.10",
+            "co",
+            "nox",
+            "solvent",
+            "freeze",
+            "traceability",
+        ):
+            self.assertIn(required_text, report_text)
         traceability = solution["traceability"]
         self.assertTrue(traceability)
         origins = {item["origin"] for item in traceability}
-        self.assertTrue({"regulatory", "user", "design_assumption"}.issubset(origins))
+        self.assertTrue({"regulatory", "user"}.issubset(origins))
+        self.assertTrue(origins.issubset({"regulatory", "user"}))
         actual = {
             (
                 item["task_object"],
