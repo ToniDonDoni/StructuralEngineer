@@ -1,4 +1,4 @@
-# Canonical Specification v0.3
+# Canonical Specification v0.4
 
 ## 1. Task
 
@@ -13,6 +13,16 @@ Develop a project solution for ventilation of a closed garage with a volume of
 
 This is a design and calculation task. No numerical design result is fixed by
 this specification at this stage.
+
+The user-provided inputs that must be preserved and classified as user inputs
+are:
+
+- average number of entries: 2 percent of parking spaces;
+- average number of exits: 8 percent of parking spaces;
+- design CO concentration: 20 mg/m3.
+
+These values are not to be silently converted into normative values or final
+equipment selections.
 
 ## 2. Normative basis
 
@@ -61,6 +71,12 @@ For NOx and solvent vapors, the design shall identify the specific substances,
 emission sources, emission rates, permissible concentrations, and any required
 combined-effect check under applicable sanitary requirements.
 
+The proving artifact shall contain explicit input records for these data and
+shall distinguish user inputs, normative or project inputs, illustrative test
+inputs, calculated outputs, and design assumptions. An illustrative test case
+may be used to prove the governing-contaminant selection, but it shall not be
+presented as the final design result.
+
 ## 4. System requirements
 
 The design shall provide:
@@ -83,6 +99,10 @@ The NOx/VOC sensors, automatic window and gate control, freeze protection,
 fault monitoring, and contaminated-air return prohibition are user or design
 requirements. They must not be presented as direct requirements of the cited
 SP clauses unless separately supported by the applicable standards.
+
+The design shall also explicitly evaluate the conditional requirements for
+air-thermal curtains at gates, fire dampers, and 100 percent redundancy for an
+underground parking facility with more than 25 parking spaces.
 
 ## 5. Applicability boundary
 
@@ -114,6 +134,18 @@ The proving tests shall demonstrate that the resulting solution:
 13. Provides supply and exhaust ventilation, general manual control, equipment
     and sensor fault monitoring, a separate fire-control algorithm, and no
     return of contaminated exhaust air.
+14. Provides a traceable mapping for every relevant clause listed in Section 2,
+    including a compliance-test identifier, source document, and regulatory
+    requirement origin. The artifact records the amendment-status check and the
+    applicable edition input for GOST 12.1.005-88.
+15. Evaluates the applicability and evidence for air-thermal curtains, fire
+    dampers, and underground-parking redundancy instead of silently assuming
+    that each conditional requirement is or is not applicable.
+16. Provides a design-report boundary with complete traceability from task
+    object through requirement, acceptance criterion, and compliance test, and
+    preserves the origin of each requirement or input.
+17. Preserves the supplied 2 percent, 8 percent, and 20 mg/m3 values as
+    user-provided inputs and contains no unsupported fixed design values.
 
 ## 7. RED proof
 
