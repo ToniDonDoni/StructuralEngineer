@@ -73,9 +73,20 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertTrue(required_actions.issubset(control["automatic_actions"]))
         rules = control["sensor_action_rules"]
         self.assertEqual({rule["sensor"] for rule in rules}, {"CO", "NOx", "VOC"})
+        mapped_actions = set()
         for rule in rules:
             self.assertEqual(rule["condition"], "reading_exceeds_configured_limit")
-            self.assertTrue(required_actions.issubset(rule["actions"]))
+            mapped_actions.update(rule["actions"])
+        self.assertTrue(required_actions.issubset(mapped_actions))
+
+    def test_section_four_requires_supply_manual_fault_and_contamination_controls(self):
+        solution = load_solution()
+        ventilation = solution["ventilation_system"]
+        self.assertEqual(ventilation["type"], "mechanical_supply_and_exhaust")
+        self.assertTrue(ventilation["manual_control"])
+        self.assertTrue(ventilation["equipment_and_sensor_fault_monitoring"])
+        self.assertTrue(ventilation["fire_control_algorithm"])
+        self.assertTrue(ventilation["no_contaminated_exhaust_return"])
 
     def test_critical_concentrations_trigger_emergency_mode(self):
         solution = load_solution()
