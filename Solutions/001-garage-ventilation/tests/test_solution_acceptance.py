@@ -107,6 +107,10 @@ EXPECTED_CLAUSE_REQUIREMENTS = {
 
 EXPECTED_AMENDMENTS = {"1", "2", "3"}
 
+EXPECTED_GOST_EDITION = (
+    "GOST 12.1.005-88 active edition; registry status verified on 2026-09-03"
+)
+
 EXPECTED_CLAUSE_TESTS = {
     "1.2": "test_applicability_check_uses_clause_1_2",
     "8.3.1": "test_section_four_requires_supply_manual_fault_and_contamination_controls",
@@ -154,6 +158,11 @@ REDUNDANCY_PROJECT_INPUTS = {
     "parking_space_count",
 }
 
+FIRE_DAMPER_PROJECT_INPUTS = {
+    "fire_compartments",
+    "ventilation_crosses_fire_compartment_boundaries",
+}
+
 ENTERING_VEHICLE_HEAT_PROJECT_INPUTS = {
     "maximum_possible_hourly_entry_count",
     "maximum_possible_hourly_entry_count_source",
@@ -165,11 +174,54 @@ ENTERING_VEHICLE_HEAT_PROJECT_INPUTS = {
 
 def available_project_inputs(inputs, required_names):
     """Return project inputs that are present and have a usable value."""
+    def usable(value):
+        if value in (None, "", {}):
+            return False
+        if isinstance(value, dict):
+            if value.get("status") == "project_input" and set(value) <= {
+                "status",
+                "source",
+                "fire_damper_applicability",
+            }:
+                return False
+            if value.get("edition") == "applicable_edition_input":
+                return False
+        return True
+
     return {
         name: inputs[name]
         for name in required_names
-        if name in inputs and inputs[name] not in (None, "")
+        if name in inputs and usable(inputs[name])
     }
+
+
+def iter_numeric_values(value, path=()):
+    """Yield JSON-pointer paths for numeric values outside the registry."""
+    if path and path[0] == "numeric_value_registry":
+        return
+    if isinstance(value, bool):
+        return
+    if isinstance(value, (int, float)):
+        yield "/" + "/".join(str(part) for part in path), value
+    elif isinstance(value, dict):
+        for key, child in value.items():
+            yield from iter_numeric_values(child, path + (key,))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from iter_numeric_values(child, path + (index,))
+
+
+def available_mandatory_inputs(inputs):
+    available = available_project_inputs(inputs, EXPECTED_MANDATORY_INPUTS)
+    user_names = {
+        item["name"]
+        for item in inputs.get("user_numeric_inputs", [])
+        if item.get("origin") == "user_provided"
+        and item.get("source") == "original_task_user_input"
+    }
+    if "garage_volume_m3" in user_names:
+        available["garage_volume_m3"] = "user_numeric_inputs"
+    return available
 
 
 def load_solution():
@@ -208,10 +260,8 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertEqual(user_inputs[name]["value"], value)
             self.assertEqual(user_inputs[name]["origin"], "user_provided")
             self.assertEqual(user_inputs[name]["design_status"], "not_a_fixed_design_value")
-            self.assertEqual(
-                user_inputs[name]["normative_basis"],
-                "SP 113.13330.2023 clause 8.3.10",
-            )
+            self.assertEqual(user_inputs[name]["source"], "original_task_user_input")
+            self.assertNotIn("normative_basis", user_inputs[name])
         categories = inputs["numeric_value_categories"]
         self.assertTrue(
             {
@@ -222,6 +272,17 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 "design_assumption",
             }.issubset(categories)
         )
+        values = dict(iter_numeric_values(solution))
+        registry = {
+            item["json_pointer"]: item
+            for item in solution["numeric_value_registry"]
+        }
+        self.assertEqual(set(registry), set(values))
+        for pointer, value in values.items():
+            entry = registry[pointer]
+            self.assertEqual(entry["value"], value)
+            self.assertIn(entry["origin"], categories)
+            self.assertIn(entry["classification"], categories)
 
     def test_all_requested_pollutants_are_covered(self):
         solution = load_solution()
@@ -463,7 +524,11 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             missing_input["result"],
             "reject_design_and_report_missing_inputs",
         )
-        self.assertTrue(EXPECTED_MANDATORY_INPUTS.issubset(missing_input["reported_fields"]))
+        available = available_mandatory_inputs(inputs)
+        expected_missing = EXPECTED_MANDATORY_INPUTS - set(available)
+        self.assertEqual(
+            set(missing_input["reported_fields"]), expected_missing
+        )
 
     def test_applicability_check_uses_clause_1_2(self):
         solution = load_solution()
@@ -522,7 +587,13 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         self.assertEqual(references["checked_on"], "2026-09-03")
         self.assertTrue(references["status_evidence"])
         self.assertEqual(references["harmful_substance_standard"], "GOST 12.1.005-88")
-        self.assertTrue(references["harmful_substance_standard_edition_input"])
+        self.assertEqual(
+            references["harmful_substance_standard_edition_input"],
+            EXPECTED_GOST_EDITION,
+        )
+        self.assertEqual(references["status"], "active")
+        self.assertEqual(references["checked_on"], "2026-09-03")
+        self.assertIn("registry", references["status_evidence"].lower())
 
     def test_conditional_gate_fire_and_redundancy_requirements_are_evaluated(self):
         solution = load_solution()
@@ -574,10 +645,27 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         )
         for case in damper_cases:
             self.assertTrue(case["evidence"])
-        self.assertIn(
-            dampers["project_decision"],
-            {"applicable", "inapplicable", "pending_missing_input"},
+        damper_project_inputs = available_project_inputs(
+            inputs, FIRE_DAMPER_PROJECT_INPUTS
         )
+        damper_missing_inputs = FIRE_DAMPER_PROJECT_INPUTS - set(
+            damper_project_inputs
+        )
+        self.assertEqual(
+            dampers["project_applicability_inputs"], damper_project_inputs
+        )
+        if damper_missing_inputs:
+            self.assertEqual(dampers["project_decision"], "pending_missing_input")
+            self.assertEqual(
+                set(dampers["missing_project_inputs"]), damper_missing_inputs
+            )
+        else:
+            expected_damper_decision = (
+                "applicable"
+                if inputs["ventilation_crosses_fire_compartment_boundaries"]
+                else "inapplicable"
+            )
+            self.assertEqual(dampers["project_decision"], expected_damper_decision)
         self.assertEqual(dampers["regulation_clause"], "8.3.11")
 
         redundancy = solution["conditional_design_checks"]["redundancy"]
