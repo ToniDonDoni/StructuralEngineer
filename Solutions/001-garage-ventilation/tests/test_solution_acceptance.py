@@ -61,23 +61,28 @@ EXPECTED_SP_CLAUSES = {
 }
 
 EXPECTED_TRACEABILITY = {
-    "air_exchange_calculation": ("8.3.10", "assimilation_calculation_for_harmful_emissions", "AC1", "test_air_exchange_is_assimilation_based_and_references_clause_8_3_10"),
-    "numeric_input_classification": ("user", "numeric_input_classification", "AC2", "test_no_unsupported_numeric_design_values_are_substituted"),
-    "pollutant_compliance": ("8.3.10", "assimilation_calculation_for_harmful_emissions", "AC3", "test_all_requested_pollutants_are_covered"),
-    "governing_airflow": ("8.3.10", "assimilation_calculation_for_harmful_emissions", "AC4", "test_governing_airflow_is_the_maximum_pollutant_flow"),
-    "exhaust_zones": ("8.3.18", "equal_upper_and_lower_exhaust_zones", "AC5", "test_exhaust_is_split_equally_between_upper_and_lower_zones"),
-    "sensor_control": ("8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
-    "emergency_mode": ("8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
-    "fire_mode": ("8.3.13", "fire_shutdown_of_general_exchange_ventilation", "AC8", "test_fire_mode_has_priority_and_prevents_normal_opening"),
-    "manual_gate_opening": ("6.1.8", "manual_gate_opening", "AC9", "test_gates_have_manual_opening"),
-    "winter_operation": ("8.3.5", "heated_parking_minimum_temperature", "AC10", "test_winter_mode_checks_temperature_heating_and_freeze_protection"),
-    "mandatory_inputs": ("8.3.10", "assimilation_calculation_for_harmful_emissions", "AC11", "test_missing_mandatory_inputs_are_reported"),
-    "applicability_boundary": ("1.2", "applicability_boundary", "AC12", "test_applicability_check_uses_clause_1_2"),
-    "ventilation_safety_controls": ("8.3.1", "heating_general_exchange_and_smoke_control_ventilation", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
-    "normative_traceability": ("user", "normative_traceability", "AC14", "test_normative_requirements_have_traceable_compliance_evidence"),
-    "conditional_requirements": ("8.3.9", "conditional_air_thermal_curtain", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
-    "design_report_traceability": ("user", "complete_engineering_task_traceability", "AC16", "test_design_report_preserves_requirement_origins_and_complete_traceability"),
-    "user_numeric_inputs": ("user", "user_provided_numeric_inputs", "AC17", "test_no_unsupported_numeric_design_values_are_substituted"),
+    ("air_exchange_calculation", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC1", "test_air_exchange_is_assimilation_based_and_references_clause_8_3_10"),
+    ("numeric_input_classification", "user", "numeric_input_classification", "AC2", "test_no_unsupported_numeric_design_values_are_substituted"),
+    ("pollutant_compliance", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC3", "test_all_requested_pollutants_are_covered"),
+    ("governing_airflow", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC4", "test_governing_airflow_is_the_maximum_pollutant_flow"),
+    ("exhaust_zones", "8.3.18", "equal_upper_and_lower_exhaust_zones", "AC5", "test_exhaust_is_split_equally_between_upper_and_lower_zones"),
+    ("sensor_control", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
+    ("emergency_mode", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
+    ("emergency_mode", "9.5", "co_measurement_and_alarm_in_enclosed_parking", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
+    ("fire_mode", "8.3.13", "fire_shutdown_of_general_exchange_ventilation", "AC8", "test_fire_mode_has_priority_and_prevents_normal_opening"),
+    ("manual_gate_opening", "6.1.8", "manual_gate_opening", "AC9", "test_gates_have_manual_opening"),
+    ("winter_operation", "8.3.5", "heated_parking_minimum_temperature", "AC10", "test_winter_mode_checks_temperature_heating_and_freeze_protection"),
+    ("winter_operation", "8.3.8", "entering_vehicle_heat_load", "AC10", "test_winter_mode_checks_temperature_heating_and_freeze_protection"),
+    ("mandatory_inputs", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC11", "test_missing_mandatory_inputs_are_reported"),
+    ("applicability_boundary", "1.2", "applicability_boundary", "AC12", "test_applicability_check_uses_clause_1_2"),
+    ("ventilation_safety_controls", "8.3.1", "heating_general_exchange_and_smoke_control_ventilation", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
+    ("ventilation_safety_controls", "8.3.17", "general_exchange_supply_and_exhaust", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
+    ("normative_traceability", "user", "normative_traceability", "AC14", "test_normative_requirements_have_traceable_compliance_evidence"),
+    ("conditional_requirements", "8.3.9", "conditional_air_thermal_curtain", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
+    ("conditional_requirements", "8.3.11", "conditional_fire_dampers", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
+    ("conditional_requirements", "8.3.21", "conditional_100_percent_redundancy", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
+    ("design_report_traceability", "user", "complete_engineering_task_traceability", "AC16", "test_design_report_preserves_requirement_origins_and_complete_traceability"),
+    ("user_numeric_inputs", "user", "user_provided_numeric_inputs", "AC17", "test_no_unsupported_numeric_design_values_are_substituted"),
 }
 
 EXPECTED_CLAUSE_REQUIREMENTS = {
@@ -133,9 +138,35 @@ EXPECTED_CLAUSE_ACCEPTANCE = {
     "6.1.8": "AC9",
 }
 
-EXPECTED_TEST_IDS = {
-    test_id for _, _, _, test_id in EXPECTED_TRACEABILITY.values()
+EXPECTED_TEST_IDS = {row[-1] for row in EXPECTED_TRACEABILITY}
+
+AIR_CURTAIN_PROJECT_INPUTS = {
+    "heated_status",
+    "parking_space_count",
+    "external_entry_exit_gates_present",
 }
+
+REDUNDANCY_PROJECT_INPUTS = {
+    "garage_location_type",
+    "parking_space_count",
+}
+
+ENTERING_VEHICLE_HEAT_PROJECT_INPUTS = {
+    "maximum_possible_hourly_entry_count",
+    "maximum_possible_hourly_entry_count_source",
+    "vehicle_heat_load_model",
+    "outdoor_temperature",
+    "parking_temperature",
+}
+
+
+def available_project_inputs(inputs, required_names):
+    """Return project inputs that are present and have a usable value."""
+    return {
+        name: inputs[name]
+        for name in required_names
+        if name in inputs and inputs[name] not in (None, "")
+    }
 
 
 def load_solution():
@@ -343,27 +374,60 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         entering_vehicle = winter["entering_vehicle_heat_load"]
         self.assertEqual(
             set(entering_vehicle["required_inputs"]),
-            {
+            ENTERING_VEHICLE_HEAT_PROJECT_INPUTS,
+        )
+        inputs = solution["inputs"]
+        available_inputs = available_project_inputs(
+            inputs, ENTERING_VEHICLE_HEAT_PROJECT_INPUTS
+        )
+        missing_inputs = ENTERING_VEHICLE_HEAT_PROJECT_INPUTS - set(available_inputs)
+        self.assertIn(
+            entering_vehicle["project_input_state"],
+            {"checked", "pending_missing_input"},
+        )
+        if missing_inputs:
+            self.assertEqual(
+                entering_vehicle["project_input_state"], "pending_missing_input"
+            )
+            self.assertEqual(
+                set(entering_vehicle["missing_project_inputs"]), missing_inputs
+            )
+        else:
+            self.assertEqual(entering_vehicle["project_input_state"], "checked")
+            heat_case = entering_vehicle["current_project_case"]
+            self.assertEqual(heat_case["origin"], "current_project_inputs")
+            self.assertEqual(
+                heat_case["entry_count_basis"],
                 "maximum_possible_hourly_entry_count",
-                "vehicle_heat_load_model",
-                "outdoor_temperature",
-                "parking_temperature",
-            },
-        )
-        heat_case = entering_vehicle["illustrative_evaluation_case"]
-        self.assertEqual(heat_case["origin"], "illustrative_verification_input")
-        self.assertEqual(
-            heat_case["entry_count_basis"], "maximum_possible_hourly_entry_count"
-        )
-        self.assertGreater(heat_case["maximum_possible_hourly_entry_count"], 0)
-        self.assertGreater(heat_case["heat_load_per_entering_vehicle"], 0)
-        self.assertGreaterEqual(
-            heat_case["reported_heat_load"],
-            heat_case["maximum_possible_hourly_entry_count"]
-            * heat_case["heat_load_per_entering_vehicle"],
-        )
-        self.assertEqual(heat_case["result_units"], "W")
-        self.assertTrue(heat_case["calculation_evidence"])
+            )
+            self.assertEqual(
+                heat_case["maximum_possible_hourly_entry_count"],
+                inputs["maximum_possible_hourly_entry_count"],
+            )
+            self.assertGreater(
+                heat_case["maximum_possible_hourly_entry_count"], 0
+            )
+            self.assertEqual(
+                heat_case["maximum_possible_hourly_entry_count_source"],
+                inputs["maximum_possible_hourly_entry_count_source"],
+            )
+            contribution = heat_case["entering_vehicle_heat_contribution"]
+            self.assertEqual(
+                contribution["model"], inputs["vehicle_heat_load_model"]
+            )
+            self.assertEqual(
+                set(contribution["input_references"]),
+                ENTERING_VEHICLE_HEAT_PROJECT_INPUTS,
+            )
+            self.assertIsInstance(contribution["result"], (int, float))
+            self.assertGreater(contribution["result"], 0)
+            self.assertEqual(contribution["units"], "W")
+            evidence = contribution["evidence"]
+            self.assertIsInstance(evidence, dict)
+            self.assertTrue(evidence["calculation_method"])
+            self.assertTrue(evidence["source"])
+            self.assertTrue(evidence["input_values"])
+            self.assertTrue(evidence["result_record"])
         self.assertEqual(entering_vehicle["regulation_clause"], "8.3.8")
 
     def test_missing_mandatory_inputs_are_reported(self):
@@ -440,6 +504,7 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
 
     def test_conditional_gate_fire_and_redundancy_requirements_are_evaluated(self):
         solution = load_solution()
+        inputs = solution["inputs"]
         gate = solution["conditional_design_checks"]["air_thermal_curtain"]
         self.assertTrue(gate["conditional"])
         self.assertTrue(gate["applicability_inputs"])
@@ -455,12 +520,28 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         for case in gate_cases:
             self.assertEqual(case["origin"], "illustrative_verification_input")
             self.assertTrue(case["evidence"])
-        self.assertIn(
-            gate["project_decision"],
-            {"required", "not_required", "pending_missing_input"},
+        gate_project_inputs = available_project_inputs(
+            inputs, AIR_CURTAIN_PROJECT_INPUTS
         )
-        if gate["project_decision"] == "pending_missing_input":
-            self.assertTrue(gate["missing_project_inputs"])
+        gate_missing_inputs = AIR_CURTAIN_PROJECT_INPUTS - set(gate_project_inputs)
+        self.assertEqual(
+            gate["project_applicability_inputs"], gate_project_inputs
+        )
+        if gate_missing_inputs:
+            self.assertEqual(gate["project_decision"], "pending_missing_input")
+            self.assertEqual(
+                set(gate["missing_project_inputs"]), gate_missing_inputs
+            )
+        else:
+            heated = inputs["heated_status"] == "heated"
+            external_gates = inputs["external_entry_exit_gates_present"] is True
+            spaces = inputs["parking_space_count"]
+            expected_gate_decision = (
+                "required"
+                if heated and external_gates and spaces >= 50
+                else "not_required"
+            )
+            self.assertEqual(gate["project_decision"], expected_gate_decision)
 
         dampers = solution["conditional_design_checks"]["fire_dampers"]
         self.assertTrue(dampers["applicability_inputs"])
@@ -497,12 +578,33 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         for case in redundancy_cases:
             self.assertEqual(case["origin"], "illustrative_verification_input")
             self.assertTrue(case["evidence"])
-        self.assertIn(
-            redundancy["project_decision"],
-            {"100_percent_reserve_required", "not_required", "pending_missing_input"},
+        redundancy_project_inputs = available_project_inputs(
+            inputs, REDUNDANCY_PROJECT_INPUTS
         )
-        if redundancy["project_decision"] == "pending_missing_input":
-            self.assertTrue(redundancy["missing_project_inputs"])
+        redundancy_missing_inputs = (
+            REDUNDANCY_PROJECT_INPUTS - set(redundancy_project_inputs)
+        )
+        self.assertEqual(
+            redundancy["project_applicability_inputs"], redundancy_project_inputs
+        )
+        if redundancy_missing_inputs:
+            self.assertEqual(
+                redundancy["project_decision"], "pending_missing_input"
+            )
+            self.assertEqual(
+                set(redundancy["missing_project_inputs"]),
+                redundancy_missing_inputs,
+            )
+        else:
+            expected_redundancy_decision = (
+                "100_percent_reserve_required"
+                if inputs["garage_location_type"] == "underground"
+                and inputs["parking_space_count"] > 25
+                else "not_required"
+            )
+            self.assertEqual(
+                redundancy["project_decision"], expected_redundancy_decision
+            )
 
     def test_design_report_preserves_requirement_origins_and_complete_traceability(self):
         solution = load_solution()
@@ -524,19 +626,18 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             )
             for item in traceability
         }
-        expected = {
-            (task_object, clause, requirement, criterion, test_id)
-            for task_object, (clause, requirement, criterion, test_id)
-            in EXPECTED_TRACEABILITY.items()
-        }
-        self.assertTrue(expected.issubset(actual))
+        self.assertEqual(actual, EXPECTED_TRACEABILITY)
         for item in traceability:
-            self.assertIn(item["task_object"], EXPECTED_TRACEABILITY)
-            expected_clause, expected_requirement, expected_criterion, expected_test = EXPECTED_TRACEABILITY[item["task_object"]]
-            self.assertEqual(item["regulation_clause"], expected_clause)
-            self.assertEqual(item["regulation_requirement"], expected_requirement)
-            self.assertEqual(item["acceptance_criterion"], expected_criterion)
-            self.assertEqual(item["compliance_test_id"], expected_test)
+            self.assertIn(
+                (
+                    item["task_object"],
+                    item["regulation_clause"],
+                    item["regulation_requirement"],
+                    item["acceptance_criterion"],
+                    item["compliance_test_id"],
+                ),
+                EXPECTED_TRACEABILITY,
+            )
 
 
 if __name__ == "__main__":
