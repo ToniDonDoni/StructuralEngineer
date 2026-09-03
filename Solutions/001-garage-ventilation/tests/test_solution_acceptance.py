@@ -158,7 +158,6 @@ PROJECT_INPUT_NUMERIC_PATHS = {
 TRACEABLE_PROJECT_ORIGINS = {
     "user_provided",
     "normative_or_project_input",
-    "illustrative_verification_input",
     "design_assumption",
 }
 TRACEABLE_PROJECT_STATUSES = {
@@ -305,12 +304,19 @@ def available_mandatory_inputs(inputs):
         "gate_and_opening_geometry",
         "fire_compartments",
     }
+    def present(value):
+        if value in (None, "", {}):
+            return False
+        if isinstance(value, dict) and "value" in value:
+            return value["value"] not in (None, "", {})
+        return True
+
     available = {
         name: inputs[name]
         for name in EXPECTED_MANDATORY_INPUTS
         if name in inputs
         and name not in placeholder_fields
-        and inputs[name] not in (None, "", {})
+        and present(inputs[name])
     }
     user_names = {
         item["name"]
@@ -867,10 +873,11 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 redundancy_missing_inputs,
             )
         else:
+            spaces = input_value(inputs, "parking_space_count")
             expected_redundancy_decision = (
                 "100_percent_reserve_required"
                 if input_value(inputs, "garage_location_type") == "underground"
-                and input_value(inputs, "parking_space_count") > 25
+                and spaces > 25
                 else "not_required"
             )
             self.assertEqual(
