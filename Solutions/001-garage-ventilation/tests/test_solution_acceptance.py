@@ -66,9 +66,9 @@ EXPECTED_TRACEABILITY = {
     ("pollutant_compliance", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC3", "test_all_requested_pollutants_are_covered"),
     ("governing_airflow", "8.3.10", "assimilation_calculation_for_harmful_emissions", "AC4", "test_governing_airflow_is_the_maximum_pollutant_flow"),
     ("exhaust_zones", "8.3.18", "equal_upper_and_lower_exhaust_zones", "AC5", "test_exhaust_is_split_equally_between_upper_and_lower_zones"),
-    ("sensor_control", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
+    ("co_monitoring", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
     ("emergency_mode", "8.5.7", "automation_monitoring_co_measurement_and_alarm", "AC7", "test_critical_concentrations_trigger_emergency_mode"),
-    ("sensor_control", "9.5", "co_measurement_and_alarm_in_enclosed_parking", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
+    ("co_monitoring", "9.5", "co_measurement_and_alarm_in_enclosed_parking", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
     ("fire_mode", "8.3.13", "fire_shutdown_of_general_exchange_ventilation", "AC8", "test_fire_mode_has_priority_and_prevents_normal_opening"),
     ("manual_gate_opening", "6.1.8", "manual_gate_opening", "AC9", "test_gates_have_manual_opening"),
     ("winter_operation", "8.3.5", "heated_parking_minimum_temperature", "AC10", "test_winter_mode_checks_temperature_heating_and_freeze_protection"),
@@ -77,6 +77,9 @@ EXPECTED_TRACEABILITY = {
     ("applicability_boundary", "1.2", "applicability_boundary", "AC12", "test_applicability_check_uses_clause_1_2"),
     ("ventilation_safety_controls", "8.3.1", "heating_general_exchange_and_smoke_control_ventilation", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
     ("ventilation_safety_controls", "8.3.17", "general_exchange_supply_and_exhaust", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
+    ("additional_pollutant_sensors", "user", "NOx_VOC_sensor_monitoring", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
+    ("automatic_openings", "user", "automatic_window_gate_control", "AC6", "test_sensor_automation_controls_ventilation_windows_and_gates"),
+    ("manual_fault_safety", "user", "manual_fault_and_contamination_controls", "AC13", "test_section_four_requires_supply_manual_fault_and_contamination_controls"),
     ("normative_traceability", "user", "normative_traceability", "AC14", "test_normative_requirements_have_traceable_compliance_evidence"),
     ("conditional_requirements", "8.3.9", "conditional_air_thermal_curtain", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
     ("conditional_requirements", "8.3.11", "conditional_fire_dampers", "AC15", "test_conditional_gate_fire_and_redundancy_requirements_are_evaluated"),
@@ -205,6 +208,10 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertEqual(user_inputs[name]["value"], value)
             self.assertEqual(user_inputs[name]["origin"], "user_provided")
             self.assertEqual(user_inputs[name]["design_status"], "not_a_fixed_design_value")
+            self.assertEqual(
+                user_inputs[name]["normative_basis"],
+                "SP 113.13330.2023 clause 8.3.10",
+            )
         categories = inputs["numeric_value_categories"]
         self.assertTrue(
             {
@@ -232,6 +239,21 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         combined = solution["combined_effect_check"]
         self.assertTrue(combined["required"])
         self.assertTrue(combined["input_source"])
+        combined_case = combined["illustrative_verification_case"]
+        self.assertEqual(
+            combined_case["origin"], "illustrative_verification_input"
+        )
+        self.assertEqual(
+            set(combined_case["relative_concentration_terms"]),
+            {"CO", "NOx", "solvent_vapors"},
+        )
+        self.assertAlmostEqual(
+            combined_case["reported_sum"],
+            sum(combined_case["relative_concentration_terms"].values()),
+        )
+        self.assertLessEqual(combined_case["reported_sum"], 1)
+        self.assertEqual(combined_case["reported_status"], "within_combined_limit")
+        self.assertTrue(combined_case["evidence"])
         results = solution["pollutant_compliance_results"]
         self.assertEqual(set(results), {"CO", "NOx", "solvent_vapors"})
         for pollutant in ("CO", "NOx", "solvent_vapors"):
