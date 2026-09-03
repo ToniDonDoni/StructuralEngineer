@@ -111,6 +111,9 @@ The proving tests shall demonstrate that the resulting solution:
 10. Checks winter temperature and freeze protection.
 11. Detects missing mandatory input data.
 12. Reports when clause 1.2 makes SP 113.13330.2023 inapplicable.
+13. Provides supply and exhaust ventilation, general manual control, equipment
+    and sensor fault monitoring, a separate fire-control algorithm, and no
+    return of contaminated exhaust air.
 
 ## 7. RED proof
 
@@ -123,4 +126,3 @@ calculation model and control solution are absent.
 All acceptance criteria shall pass. The resulting design report shall trace
 each normative requirement to its SP clause and distinguish normative
 requirements, user requirements, and design assumptions.
-
