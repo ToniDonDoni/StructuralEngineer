@@ -304,13 +304,16 @@ def available_mandatory_inputs(inputs):
         "gate_and_opening_geometry",
         "fire_compartments",
     }
-    def present(value):
+    def empty(value):
         if value in (None, "", {}):
-            return False
-        if isinstance(value, (list, tuple, set)) and not value:
+            return True
+        return isinstance(value, (list, tuple, set)) and not value
+
+    def present(value):
+        if empty(value):
             return False
         if isinstance(value, dict) and "value" in value:
-            return value["value"] not in (None, "", {})
+            return not empty(value["value"])
         return True
 
     available = {
@@ -688,6 +691,12 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         empty_list_probe["specific_nox_substances"] = []
         probe_available = available_mandatory_inputs(empty_list_probe)
         self.assertNotIn("specific_nox_substances", probe_available)
+        nested_empty_list_probe = dict(inputs)
+        nested_empty_list_probe["vehicle_entry_rate"] = dict(
+            inputs["vehicle_entry_rate"], value=[]
+        )
+        probe_available = available_mandatory_inputs(nested_empty_list_probe)
+        self.assertNotIn("vehicle_entry_rate", probe_available)
 
     def test_applicability_check_uses_clause_1_2(self):
         solution = load_solution()
