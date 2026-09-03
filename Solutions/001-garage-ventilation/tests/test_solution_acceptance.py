@@ -88,6 +88,17 @@ EXPECTED_TRACEABILITY = {
     ("user_numeric_inputs", "user", "user_provided_numeric_inputs", "AC17", "test_no_unsupported_numeric_design_values_are_substituted"),
 }
 
+EXPECTED_TRACEABILITY_ORIGINS = {
+    row: (
+        "design_assumption"
+        if row[0] == "governing_airflow"
+        else "user"
+        if row[1] == "user"
+        else "regulatory"
+    )
+    for row in EXPECTED_TRACEABILITY
+}
+
 EXPECTED_CLAUSE_REQUIREMENTS = {
     "1.2": "applicability_boundary",
     "8.3.1": "heating_general_exchange_and_smoke_control_ventilation",
@@ -110,6 +121,45 @@ EXPECTED_AMENDMENTS = {"1", "2", "3"}
 EXPECTED_GOST_EDITION = (
     "GOST 12.1.005-88 active edition; registry status verified on 2026-09-03"
 )
+
+EXPECTED_NUMERIC_CONTEXTS = {
+    "/inputs/user_numeric_inputs/0/value": ("user_provided", "user_provided", 360),
+    "/inputs/user_numeric_inputs/1/value": ("user_provided", "user_provided", 2),
+    "/inputs/user_numeric_inputs/2/value": ("user_provided", "user_provided", 8),
+    "/inputs/user_numeric_inputs/3/value": ("user_provided", "user_provided", 20),
+    "/inputs/vehicle_entry_rate/value": ("user_provided", "user_provided", 2),
+    "/inputs/vehicle_exit_rate/value": ("user_provided", "user_provided", 8),
+    "/combined_effect_check/illustrative_verification_case/relative_concentration_terms/CO": ("illustrative_verification_input", "illustrative_verification_input", 0.5),
+    "/combined_effect_check/illustrative_verification_case/relative_concentration_terms/NOx": ("illustrative_verification_input", "illustrative_verification_input", 0.25),
+    "/combined_effect_check/illustrative_verification_case/relative_concentration_terms/solvent_vapors": ("illustrative_verification_input", "illustrative_verification_input", 0.1),
+    "/combined_effect_check/illustrative_verification_case/reported_sum": ("calculated_output", "calculated_output", 0.85),
+    "/pollutant_compliance_results/CO/illustrative_evaluation_case/reported_concentration": ("illustrative_verification_input", "illustrative_verification_input", 10),
+    "/pollutant_compliance_results/CO/illustrative_evaluation_case/permissible_concentration": ("illustrative_verification_input", "illustrative_verification_input", 20),
+    "/pollutant_compliance_results/NOx/illustrative_evaluation_case/reported_concentration": ("illustrative_verification_input", "illustrative_verification_input", 1),
+    "/pollutant_compliance_results/NOx/illustrative_evaluation_case/permissible_concentration": ("illustrative_verification_input", "illustrative_verification_input", 2),
+    "/pollutant_compliance_results/solvent_vapors/illustrative_evaluation_case/reported_concentration": ("illustrative_verification_input", "illustrative_verification_input", 1),
+    "/pollutant_compliance_results/solvent_vapors/illustrative_evaluation_case/permissible_concentration": ("illustrative_verification_input", "illustrative_verification_input", 50),
+    "/airflow_calculation/illustrative_verification_case/pollutant_flows/CO": ("illustrative_verification_input", "illustrative_verification_input", 100),
+    "/airflow_calculation/illustrative_verification_case/pollutant_flows/NOx": ("illustrative_verification_input", "illustrative_verification_input", 200),
+    "/airflow_calculation/illustrative_verification_case/pollutant_flows/VOC": ("illustrative_verification_input", "illustrative_verification_input", 150),
+    "/airflow_calculation/illustrative_verification_case/reported_required_flow": ("calculated_output", "calculated_output", 200),
+    "/ventilation_system/exhaust_zones/upper_share": ("normative_or_project_input", "normative_or_project_input", 0.5),
+    "/ventilation_system/exhaust_zones/lower_share": ("normative_or_project_input", "normative_or_project_input", 0.5),
+    "/control_logic/emergency_mode/verification_case/sensor_readings/CO": ("illustrative_verification_input", "illustrative_verification_input", 21),
+    "/control_logic/emergency_mode/verification_case/sensor_readings/NOx": ("illustrative_verification_input", "illustrative_verification_input", 3),
+    "/control_logic/emergency_mode/verification_case/sensor_readings/VOC": ("illustrative_verification_input", "illustrative_verification_input", 3),
+    "/control_logic/emergency_mode/verification_case/threshold_values/CO": ("illustrative_verification_input", "illustrative_verification_input", 20),
+    "/control_logic/emergency_mode/verification_case/threshold_values/NOx": ("illustrative_verification_input", "illustrative_verification_input", 2),
+    "/control_logic/emergency_mode/verification_case/threshold_values/VOC": ("illustrative_verification_input", "illustrative_verification_input", 2),
+    "/winter_mode/temperature_check/heated_parking_minimum_c": ("normative_or_project_input", "normative_or_project_input", 8),
+}
+
+DESIGN_ASSUMPTION_NUMERIC_PATHS = {
+    "/inputs/parking_space_count/value",
+    "/inputs/maximum_possible_hourly_entry_count/value",
+    "/inputs/outdoor_temperature/value",
+    "/inputs/parking_temperature/value",
+}
 
 EXPECTED_CLAUSE_TESTS = {
     "1.2": "test_applicability_check_uses_clause_1_2",
@@ -178,14 +228,27 @@ def available_project_inputs(inputs, required_names):
         if value in (None, "", {}):
             return False
         if isinstance(value, dict):
-            if value.get("status") == "project_input" and set(value) <= {
-                "status",
+            if not {
+                "value",
+                "origin",
                 "source",
-                "fire_damper_applicability",
+                "status",
+            }.issubset(value):
+                return False
+            if value["origin"] not in {
+                "user_provided",
+                "normative_or_project_input",
+                "illustrative_verification_input",
+                "design_assumption",
             }:
                 return False
-            if value.get("edition") == "applicable_edition_input":
+            if not value["source"] or value["status"] not in {
+                "current_project_input",
+                "conditional_assumption",
+            }:
                 return False
+        elif isinstance(value, str):
+            return value not in {"project_input", "applicable_edition_input"}
         return True
 
     return {
@@ -209,6 +272,25 @@ def iter_numeric_values(value, path=()):
     elif isinstance(value, list):
         for index, child in enumerate(value):
             yield from iter_numeric_values(child, path + (index,))
+
+
+def json_pointer_value(value, pointer):
+    current = value
+    for part in pointer.strip("/").split("/"):
+        current = current[int(part)] if isinstance(current, list) else current[part]
+    return current
+
+
+def input_value(inputs, name):
+    value = inputs[name]
+    return value["value"] if isinstance(value, dict) and "value" in value else value
+
+
+def contains_design_assumption(records):
+    return any(
+        isinstance(record, dict) and record.get("origin") == "design_assumption"
+        for record in records.values()
+    )
 
 
 def available_mandatory_inputs(inputs):
@@ -278,11 +360,30 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             for item in solution["numeric_value_registry"]
         }
         self.assertEqual(set(registry), set(values))
+        self.assertTrue(set(values).issubset(
+            set(EXPECTED_NUMERIC_CONTEXTS) | DESIGN_ASSUMPTION_NUMERIC_PATHS
+        ))
         for pointer, value in values.items():
             entry = registry[pointer]
             self.assertEqual(entry["value"], value)
-            self.assertIn(entry["origin"], categories)
-            self.assertIn(entry["classification"], categories)
+            if pointer in EXPECTED_NUMERIC_CONTEXTS:
+                expected_origin, expected_classification, expected_value = (
+                    EXPECTED_NUMERIC_CONTEXTS[pointer]
+                )
+                self.assertEqual(value, expected_value)
+                self.assertEqual(entry["origin"], expected_origin)
+                self.assertEqual(entry["classification"], expected_classification)
+            else:
+                self.assertIn(pointer, DESIGN_ASSUMPTION_NUMERIC_PATHS)
+                record = json_pointer_value(
+                    solution, pointer.rsplit("/", 1)[0]
+                )
+                self.assertIsInstance(record, dict)
+                self.assertEqual(record["origin"], "design_assumption")
+                self.assertEqual(record["status"], "conditional_assumption")
+                self.assertTrue(record["source"])
+                self.assertEqual(entry["origin"], "design_assumption")
+                self.assertEqual(entry["classification"], "design_assumption")
 
     def test_all_requested_pollutants_are_covered(self):
         solution = load_solution()
@@ -485,18 +586,18 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(
                 heat_case["maximum_possible_hourly_entry_count"],
-                inputs["maximum_possible_hourly_entry_count"],
+                input_value(inputs, "maximum_possible_hourly_entry_count"),
             )
             self.assertGreater(
                 heat_case["maximum_possible_hourly_entry_count"], 0
             )
             self.assertEqual(
                 heat_case["maximum_possible_hourly_entry_count_source"],
-                inputs["maximum_possible_hourly_entry_count_source"],
+                input_value(inputs, "maximum_possible_hourly_entry_count_source"),
             )
             contribution = heat_case["entering_vehicle_heat_contribution"]
             self.assertEqual(
-                contribution["model"], inputs["vehicle_heat_load_model"]
+                contribution["model"], input_value(inputs, "vehicle_heat_load_model")
             )
             self.assertEqual(
                 set(contribution["input_references"]),
@@ -511,6 +612,14 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
             self.assertTrue(evidence["source"])
             self.assertTrue(evidence["input_values"])
             self.assertTrue(evidence["result_record"])
+            if any(
+                isinstance(inputs.get(name), dict)
+                and inputs[name].get("origin") == "design_assumption"
+                for name in ENTERING_VEHICLE_HEAT_PROJECT_INPUTS
+            ):
+                self.assertIn(
+                    heat_case["origin"], {"conditional_design_assumption"}
+                )
         self.assertEqual(entering_vehicle["regulation_clause"], "8.3.8")
 
     def test_missing_mandatory_inputs_are_reported(self):
@@ -626,15 +735,17 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 set(gate["missing_project_inputs"]), gate_missing_inputs
             )
         else:
-            heated = inputs["heated_status"] == "heated"
-            external_gates = inputs["external_entry_exit_gates_present"] is True
-            spaces = inputs["parking_space_count"]
+            heated = input_value(inputs, "heated_status") == "heated"
+            external_gates = input_value(inputs, "external_entry_exit_gates_present") is True
+            spaces = input_value(inputs, "parking_space_count")
             expected_gate_decision = (
                 "required"
                 if heated and external_gates and spaces >= 50
                 else "not_required"
             )
             self.assertEqual(gate["project_decision"], expected_gate_decision)
+            if contains_design_assumption(gate_project_inputs):
+                self.assertIn("conditional", gate["decision_evidence"])
 
         dampers = solution["conditional_design_checks"]["fire_dampers"]
         self.assertTrue(dampers["applicability_inputs"])
@@ -662,10 +773,12 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         else:
             expected_damper_decision = (
                 "applicable"
-                if inputs["ventilation_crosses_fire_compartment_boundaries"]
+                if input_value(inputs, "ventilation_crosses_fire_compartment_boundaries")
                 else "inapplicable"
             )
             self.assertEqual(dampers["project_decision"], expected_damper_decision)
+            if contains_design_assumption(damper_project_inputs):
+                self.assertIn("conditional", dampers["project_decision_evidence"])
         self.assertEqual(dampers["regulation_clause"], "8.3.11")
 
         redundancy = solution["conditional_design_checks"]["redundancy"]
@@ -708,13 +821,15 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
         else:
             expected_redundancy_decision = (
                 "100_percent_reserve_required"
-                if inputs["garage_location_type"] == "underground"
-                and inputs["parking_space_count"] > 25
+                if input_value(inputs, "garage_location_type") == "underground"
+                and input_value(inputs, "parking_space_count") > 25
                 else "not_required"
             )
             self.assertEqual(
                 redundancy["project_decision"], expected_redundancy_decision
             )
+            if contains_design_assumption(redundancy_project_inputs):
+                self.assertIn("conditional", redundancy["decision_evidence"])
 
     def test_design_report_preserves_requirement_origins_and_complete_traceability(self):
         solution = load_solution()
@@ -733,10 +848,15 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                 item["regulation_requirement"],
                 item["acceptance_criterion"],
                 item["compliance_test_id"],
+                item["origin"],
             )
             for item in traceability
         }
-        self.assertEqual(actual, EXPECTED_TRACEABILITY)
+        expected_with_origins = {
+            (*row, EXPECTED_TRACEABILITY_ORIGINS[row])
+            for row in EXPECTED_TRACEABILITY
+        }
+        self.assertEqual(actual, expected_with_origins)
         for item in traceability:
             self.assertIn(
                 (
@@ -745,8 +865,9 @@ class GarageVentilationAcceptanceTests(unittest.TestCase):
                     item["regulation_requirement"],
                     item["acceptance_criterion"],
                     item["compliance_test_id"],
+                    item["origin"],
                 ),
-                EXPECTED_TRACEABILITY,
+                expected_with_origins,
             )
 
 
