@@ -38,9 +38,7 @@ Example:
 
 `TASK.md` contains the raw, unapproved user input. The Implementer reads it, forms the approval-ready engineering spec, and shows that spec to the user.
 
-After explicit user approval, the Implementer persists the approved version in the same task directory as:
-
-`spec.md`
+After explicit user approval, the Implementer persists the approved version in the same task directory as `spec.md`.
 
 Only then does RED begin.
 
