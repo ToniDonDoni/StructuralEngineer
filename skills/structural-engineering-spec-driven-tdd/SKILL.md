@@ -3,7 +3,7 @@ name: structural-engineering-spec-driven-tdd
 description: "Spec-Driven Test-Driven Development framework for structural and construction engineering tasks under Russian construction regulations: human-approved spec, independently reviewed RED and GREEN."
 license: MIT
 metadata:
-  version: 1.2.3
+  version: 1.2.4
   author: GPT-5.6 Sol
 ---
 
@@ -274,12 +274,13 @@ Run the narrow proving command and commit RED with an ASCII-only commit message.
 
 ### RED_REVIEW — Reviewer agent
 
-The independent Reviewer reads:
+The independent Reviewer reads, in this order:
 
-1. the original user task from `TASK.md`;
-2. the approved `SPEC.md` and complete `AC1...ACN` list;
-3. the RED commits/tests;
-4. proving evidence.
+1. `SKILL.md`;
+2. the original user task from `TASK.md`;
+3. the approved `SPEC.md` and complete `AC1...ACN` list;
+4. the RED commits/tests;
+5. proving evidence.
 
 The Reviewer checks that:
 
@@ -337,7 +338,13 @@ Run proving tests and relevant regression tests, then commit with an ASCII-only 
 
 ### GREEN_REVIEW — Reviewer agent
 
-The independent Reviewer reads `TASK.md`, approved `SPEC.md`, complete AC list, reviewed RED, GREEN commits, and engineering result.
+The independent Reviewer reads, in this order:
+
+1. `SKILL.md`;
+2. `TASK.md`;
+3. the approved `SPEC.md` and complete AC list;
+4. reviewed RED;
+5. GREEN commits and engineering result.
 
 The Reviewer checks that:
 
