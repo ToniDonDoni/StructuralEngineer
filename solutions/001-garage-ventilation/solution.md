@@ -3,7 +3,7 @@
 ## Scope and input status
 
 This artifact proposes the ventilation and control architecture for the
-360 m3 garage described in `Tasks/001-garage-ventilation/spec.md`. It does not
+360 m3 garage described in `tasks/001-garage-ventilation/SPEC.md`. It does not
 invent a parking-space count, location type, heating status, gate geometry,
 traffic rate, outdoor temperature, vehicle data, or solvent emission data.
 Those values are required project inputs and are reported as missing in
