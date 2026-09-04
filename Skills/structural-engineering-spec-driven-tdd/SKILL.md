@@ -3,7 +3,7 @@ name: structural-engineering-spec-driven-tdd
 description: "Spec-Driven Test-Driven Development framework for structural and construction engineering tasks under Russian construction regulations: human-approved spec, independently reviewed RED and GREEN."
 license: MIT
 metadata:
-  version: 1.2.0
+  version: 1.2.1
   author: GPT-5.6 Sol
 ---
 
@@ -11,11 +11,27 @@ metadata:
 
 Copy `SKILL.md` to `<agent_skill_directory>/structural-engineering-spec-driven-tdd/`.
 
+User input may be provided directly in chat or stored in a task-local `SPEC-DRAFT.md`.
+
+### Direct user input
+
 Ask the agent:
 
-`Use structural-engineering-spec-driven-tdd skill and solve this engineering task.`
+`Use structural-engineering-spec-driven-tdd skill and solve this engineering task: <task>`
 
-The agent first presents the engineering spec and asks for approval.
+### SPEC-DRAFT input
+
+Create `<task-directory>/SPEC-DRAFT.md` containing only the user's raw, unapproved task input, for example:
+
+```text
+How to strengthen the foundation of an old brick house without completely replacing it?
+```
+
+Then ask the agent:
+
+`Use structural-engineering-spec-driven-tdd skill. Read <task-directory>/SPEC-DRAFT.md as the user input, form the approval-ready engineering spec, and show it to me for approval.`
+
+`SPEC-DRAFT.md` is source input, not an approved spec. The agent reads it, forms the approval-ready spec, and presents that spec to the user. After explicit user approval, the approved version becomes the canonical spec; when the repository uses task-local spec files, persist it as `spec.md`. RED begins only after that approval.
 
 # Structural Engineering Spec-Driven TDD
 
@@ -29,8 +45,8 @@ For engineering tasks, the spec establishes what must be true. RED defines how e
 
 ## Workflow
 
-1. **User** provides an engineering task.
-2. **Implementer** analyzes the task, identifies engineering objects, finds the applicable Russian normative basis, identifies required inputs and assumptions, and produces a compact approval spec with a complete acceptance-criteria list.
+1. **User** provides an engineering task directly or through `SPEC-DRAFT.md`.
+2. **Implementer** reads the user input, analyzes the task, identifies engineering objects, finds the applicable Russian normative basis, identifies required inputs and assumptions, and produces a compact approval spec with a complete acceptance-criteria list.
 3. **User** explicitly approves the spec.
 4. **Implementer** writes RED tests covering every approved acceptance criterion and proves they fail for the intended reason.
 5. **Reviewer**, running independently from the Implementer, performs `RED_REVIEW`.
@@ -60,6 +76,8 @@ The Reviewer performs only:
 ## Spec
 
 The purpose of the Spec stage is to produce a compact engineering contract that the user can inspect and approve before any RED test or GREEN calculation is written.
+
+The source user input may come directly from chat or from `SPEC-DRAFT.md`. `SPEC-DRAFT.md` is unapproved input and must not be treated as the canonical spec before explicit user approval.
 
 The approved spec defines **what must be true**. It does not define the proving tests or implementation.
 
@@ -192,7 +210,7 @@ The approval-ready spec must contain exactly the information needed to agree on 
 
 The user-approved version is the canonical spec for RED and GREEN.
 
-If the project already has a `specs/` directory, keep one flat numbered spec per change there: `specs/spec_<number>.md`. If the project has no `specs/` directory, do not create one only for this workflow; preserve the approved spec with the proving tests using the repository's existing conventions.
+If the project already has a `specs/` directory, keep one flat numbered spec per change there: `specs/spec_<number>.md`. If the project has no `specs/` directory, do not create one only for this workflow; preserve the approved spec with the proving tests using the repository's existing conventions. When the task already uses a task-local `SPEC-DRAFT.md`, the approved task-local spec may be persisted as `spec.md` after user approval.
 
 When a spec file is used, commit it with an ASCII-only commit message and obtain explicit user approval before RED.
 
@@ -202,11 +220,11 @@ There is no `SPEC_REVIEW` stage.
 
 If the user adds or changes a requirement after work has started, preserve the approved specification history.
 
-Treat the working document as `SPEC-DRAFT` and append the new requirement as:
+When `SPEC-DRAFT.md` is used, keep it as the append-only source/change record and append the new requirement as:
 
 `ADDITION: <requirement>`
 
-Record the change in the task/spec journal, commit it, identify affected objects/norms/inputs/ACs, and replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived.
+Record the change in the task/spec journal, commit it, identify affected objects/norms/inputs/ACs, update the approval-ready spec, and replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived.
 
 ## RED
 
