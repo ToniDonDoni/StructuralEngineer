@@ -1,9 +1,9 @@
 ---
 name: structural-engineering-spec-driven-tdd
-description: "Spec-Driven Test-Driven Development framework for structural and construction engineering tasks under Russian construction regulations: human-approved spec, independently reviewed RED and GREEN."
+description: "Spec-Driven Test-Driven Development framework for structural and construction engineering tasks under Russian construction regulations: independently reviewed spec, human approval, independently reviewed RED and GREEN."
 license: MIT
 metadata:
-  version: 1.2.4
+  version: 1.2.5
   author: GPT-5.6 Sol
 ---
 
@@ -36,7 +36,7 @@ Example:
 
 `Use structural-engineering-spec-driven-tdd skill. Work from tasks/002-foundation-strengthening/TASK.md according to the skill.`
 
-`TASK.md` contains the raw, unapproved user input. The Implementer reads it, forms the approval-ready engineering spec, and shows that spec to the user.
+`TASK.md` contains the raw, unapproved user input. The Implementer reads it, forms the approval-ready engineering spec, sends that draft to an independent Reviewer for `SPEC_REVIEW`, and shows the reviewed spec to the user only after `SPEC_REVIEW: PASS`.
 
 After explicit user approval, the Implementer persists the approved version in the same task directory as `SPEC.md`.
 
@@ -44,28 +44,31 @@ Only then does RED begin.
 
 The task flow is:
 
-`User Input -> TASK.md -> Approval-ready Spec -> User Approval -> SPEC.md -> RED -> RED_REVIEW -> GREEN -> GREEN_REVIEW`
+`User Input -> TASK.md -> Approval-ready Spec -> SPEC_REVIEW -> User Approval -> SPEC.md -> RED -> RED_REVIEW -> GREEN -> GREEN_REVIEW`
 
 # Structural Engineering Spec-Driven TDD
 
 Use this workflow for structural, construction, and building-engineering tasks.
 
-For engineering tasks, the spec establishes what must be true. RED defines how each approved acceptance criterion is proved. GREEN performs the engineering calculation or implementation.
+For engineering tasks, the spec establishes what must be true. SPEC_REVIEW independently checks the task interpretation and normative basis before the user is asked to approve it. RED defines how each approved acceptance criterion is proved. GREEN performs the engineering calculation or implementation.
 
 ## Workflow
 
 1. **User** provides an engineering task directly or through an existing task-local `TASK.md`.
 2. **Implementer** ensures the task has a task-local `TASK.md`: create the next numbered task directory and `TASK.md` from direct user input when needed, or reuse the existing task directory when already present.
-3. **Implementer** reads `TASK.md`, analyzes the task, identifies engineering objects, finds the applicable Russian normative basis, identifies required inputs and assumptions, and produces a compact approval-ready spec with a complete acceptance-criteria list.
-4. **User** explicitly approves the spec.
-5. **Implementer** persists the approved spec as task-local `SPEC.md` and commits it.
-6. **Implementer** writes RED tests covering every approved acceptance criterion and proves they fail for the intended reason.
-7. **Reviewer**, running independently from the Implementer, performs `RED_REVIEW`.
-8. On `RED_REVIEW: FAIL`, the Implementer fixes RED, reruns it, commits, and requests independent review again until `RED_REVIEW: PASS`.
-9. **Implementer** performs the minimum GREEN calculation or implementation required by the approved spec.
-10. **Reviewer**, again independently, performs `GREEN_REVIEW`.
-11. On `GREEN_REVIEW: FAIL`, the Implementer fixes GREEN, reruns relevant tests, commits, and requests independent review again until `GREEN_REVIEW: PASS`.
-12. The task is complete only after `GREEN_REVIEW: PASS` and the original engineering task is demonstrably resolved.
+3. **Implementer** reads `TASK.md`, analyzes the task, identifies engineering objects, processes, and conditions, finds the applicable Russian normative basis, identifies required inputs and assumptions, and produces a compact approval-ready spec with a complete acceptance-criteria list.
+4. **Reviewer**, running independently from the Implementer, performs `SPEC_REVIEW` of the task interpretation and normative basis.
+5. On `SPEC_REVIEW: FAIL`, the Implementer fixes the approval-ready spec and requests independent `SPEC_REVIEW` again until `SPEC_REVIEW: PASS`.
+6. **Implementer** presents the reviewed approval-ready spec to the User.
+7. **User** explicitly approves the spec.
+8. **Implementer** persists the approved spec as task-local `SPEC.md` and commits it.
+9. **Implementer** writes RED tests covering every approved acceptance criterion and proves they fail for the intended reason.
+10. **Reviewer**, running independently from the Implementer, performs `RED_REVIEW`.
+11. On `RED_REVIEW: FAIL`, the Implementer fixes RED, reruns it, commits, and requests independent review again until `RED_REVIEW: PASS`.
+12. **Implementer** performs the minimum GREEN calculation or implementation required by the approved spec.
+13. **Reviewer**, again independently, performs `GREEN_REVIEW`.
+14. On `GREEN_REVIEW: FAIL`, the Implementer fixes GREEN, reruns relevant tests, commits, and requests independent review again until `GREEN_REVIEW: PASS`.
+15. The task is complete only after `GREEN_REVIEW: PASS` and the original engineering task is demonstrably resolved.
 
 Work on a dedicated feature branch unless the user explicitly requests otherwise. Never implement directly on the repository's main/default branch.
 
@@ -73,7 +76,7 @@ Work on a dedicated feature branch unless the user explicitly requests otherwise
 
 ### Implementer
 
-The Implementer owns task analysis, spec formation, user approval, RED, RED fixes, GREEN, GREEN fixes, and completion.
+The Implementer owns task analysis, spec formation, SPEC_REVIEW fixes, user approval, RED, RED fixes, GREEN, GREEN fixes, and completion.
 
 ### Reviewer
 
@@ -83,12 +86,13 @@ The Reviewer must not edit the spec, RED tests, or GREEN solution and must not f
 
 The Reviewer performs only:
 
+- `SPEC_REVIEW`
 - `RED_REVIEW`
 - `GREEN_REVIEW`
 
 ## Spec
 
-The purpose of the Spec stage is to produce a compact engineering contract that the user can inspect and approve before any RED test or GREEN calculation is written.
+The purpose of the Spec stage is to produce a compact engineering contract that an independent Reviewer can check and the user can inspect and approve before any RED test or GREEN calculation is written.
 
 The source user input is the task-local `TASK.md`. `TASK.md` is unapproved input and is not the canonical spec.
 
@@ -117,19 +121,19 @@ The Implementer performs enough engineering and regulatory research to produce t
 
 State what engineering problem must be solved and preserve the user's explicit requirements and constraints.
 
-#### 2. Engineering objects
+#### 2. Engineering objects and processes
 
-Identify the objects and conditions that materially affect the task.
+Identify the objects, processes, and conditions that materially affect the task.
 
-Examples include structural members, systems, loads, materials, supports, operating conditions, environmental conditions, fire compartments, interfaces, or other objects that change a normative requirement, calculation branch, or engineering conclusion.
+Examples include structural members, systems, loads, materials, supports, construction or strengthening processes, operating conditions, environmental conditions, fire compartments, interfaces, or other objects/processes that change a normative requirement, calculation branch, or engineering conclusion.
 
 Build:
 
-`User Task -> Engineering Objects`
+`User Task -> Engineering Objects / Processes`
 
 #### 3. Normative Basis
 
-For every material engineering object, identify the applicable Russian normative documents and relevant clauses.
+For every material engineering object or process, identify the applicable Russian normative documents and relevant clauses.
 
 For each material requirement record:
 
@@ -142,7 +146,7 @@ For each material requirement record:
 
 Build:
 
-`Engineering Object -> Regulation -> Clause -> Requirement`
+`Engineering Object / Process -> Regulation -> Clause -> Requirement`
 
 The **Normative Basis is mandatory in the approved spec**. Every SP, SNiP, GOST, or other normative document materially required to solve the task must be listed.
 
@@ -203,16 +207,50 @@ Examples:
 
 The spec traceability stops at:
 
-`Engineering Object -> User/Regulatory Requirement -> Acceptance Criterion`
+`Engineering Object / Process -> User/Regulatory Requirement -> Acceptance Criterion`
 
 Defining proving tests belongs to RED.
 
+### SPEC_REVIEW — Reviewer agent
+
+Before the approval-ready spec is shown to the user, an independent Reviewer performs `SPEC_REVIEW`.
+
+The independent Reviewer reads, in this order:
+
+1. `SKILL.md`;
+2. the original user task from `TASK.md`;
+3. the approval-ready spec draft, including its Engineering Objects / Processes and Normative Basis.
+
+`SPEC_REVIEW` is deliberately narrow. The Reviewer checks only:
+
+- whether the engineering objects, processes, and material conditions extracted from the task are accurate, relevant, and sufficiently complete for the task;
+- whether any material object/process was invented, omitted, or materially misclassified;
+- whether every normative document selected for the task is actually relevant and applicable to the claimed object, process, or requirement;
+- whether document identifiers, titles, scopes, editions/revisions, amendments, and current status are accurate and up to date;
+- whether cited sections/clauses are relevant to the requirement attributed to them;
+- whether authoritative sources support the identity, status, and applicability claims made for the normative documents.
+
+`SPEC_REVIEW` does **not** approve the engineering solution, choose a design method for the user, define RED tests, or perform GREEN calculations. User approval remains a separate mandatory stage after `SPEC_REVIEW: PASS`.
+
+`SPEC_REVIEW: PASS` is forbidden when a material task object/process is missing or materially wrong, or when a material normative document is obsolete without justification, incorrectly identified, irrelevant, inapplicable, or used for a requirement outside its actual scope.
+
+Reviewer returns:
+
+- `SPEC_REVIEW: PASS`
+- `SPEC_REVIEW: FAIL`
+- `SPEC_REVIEW: NEEDS_CLARIFICATION`
+- `SPEC_REVIEW: BLOCKED`
+
+On `FAIL`, the Implementer corrects the approval-ready spec and requests independent `SPEC_REVIEW` again.
+
+The approval-ready spec may be shown to the user for approval only after `SPEC_REVIEW: PASS`.
+
 ### Spec target shown to the user
 
-The approval-ready spec must contain exactly the information needed to agree on the engineering task before testing or implementation:
+The reviewed approval-ready spec must contain exactly the information needed to agree on the engineering task before testing or implementation:
 
 - **Task Summary**
-- **Engineering Objects**
+- **Engineering Objects and Processes**
 - **Normative Basis** — participating SP/SNiP/GOST/other regulations and relevant clauses
 - **Known Inputs** and their origins
 - **Missing Inputs**
@@ -221,13 +259,11 @@ The approval-ready spec must contain exactly the information needed to agree on 
 - **RED proof boundary** — which public engineering artifact/result will later be tested and why it is currently absent or incomplete
 - **GREEN condition** — what accepted engineering result will constitute completion
 
-The approval-ready spec is shown to the user before it becomes canonical.
+After `SPEC_REVIEW: PASS`, the approval-ready spec is shown to the user before it becomes canonical.
 
 After explicit user approval, persist the canonical approved spec in the same task directory as `SPEC.md`.
 
 Commit `SPEC.md` with an ASCII-only commit message before RED.
-
-There is no `SPEC_REVIEW` stage.
 
 ## Mid-work requirement changes
 
@@ -237,7 +273,7 @@ Append the new raw user requirement to task-local `TASK.md` as:
 
 `ADDITION: <requirement>`
 
-Identify affected objects/norms/inputs/ACs, update the approval-ready spec, and replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived. After approval, update the canonical `SPEC.md` before continuing affected RED/GREEN work.
+Identify affected objects/processes/norms/inputs/ACs and update the approval-ready spec. If the change affects engineering objects, processes, conditions, or the Normative Basis, obtain a new independent `SPEC_REVIEW: PASS` for the affected spec before presenting it to the user for renewed approval. Replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived. After approval, update the canonical `SPEC.md` before continuing affected RED/GREEN work.
 
 ## RED
 
@@ -382,13 +418,26 @@ Use the project's existing architecture and conventions.
 
 Commit messages are ASCII-only.
 
-Passing tests never replace independent RED/GREEN review.
+Passing tests never replace independent SPEC/RED/GREEN review.
 
 ## Completion
 
-Report the approved spec source, RED result/commit, GREEN result/commit, final review verdict, principal normative basis, important assumptions or unresolved inputs, and how the accepted result resolves the original engineering task.
+Report the approved spec source, SPEC_REVIEW verdict, RED result/commit, GREEN result/commit, final review verdict, principal normative basis, important assumptions or unresolved inputs, and how the accepted result resolves the original engineering task.
 
 # Addendum — Review report examples
+
+## SPEC_REVIEW example
+
+```text
+SPEC_REVIEW
+
+Task interpretation: PASS
+Normative basis: FAIL
+
+SP 16.13330 is a steel-structures standard and does not support the claimed reinforced-concrete strengthening requirement.
+
+SPEC_REVIEW: FAIL
+```
 
 ## RED_REVIEW example
 
