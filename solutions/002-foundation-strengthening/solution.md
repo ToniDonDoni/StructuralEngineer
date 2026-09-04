@@ -63,17 +63,18 @@ All documents were checked against FGIS Gosstandart for current status.
 
 Foundation base bearing capacity is calculated per SP 45.133330 clause 5.3.
 Using design assumptions for medium dense sand (void ratio 0.65), foundation
-width 0.6 m, embedment depth 1.5 m:
+width 1.5 m, embedment depth 1.5 m:
 
 - Design soil resistance: 200 kPa (conditional, based on design assumption).
-- Applied foundation pressure: 150 kPa.
-- Check: 150 kPa < 200 kPa — OK.
+- Applied foundation pressure: 146.7 kPa (220 kN / (1.5 m x 1.0 m)).
+- Check: 146.7 kPa < 200 kPa — OK.
 
 ## Settlement Calculation
 
 Settlement is calculated per SP 45.133330 clause 5.6:
 
-- Total settlement: 45 mm (within allowable 80 mm).
+- Applied pressure: 146.7 kPa.
+- Total settlement: 38 mm (within allowable 80 mm).
 - Angular distortion: 0.002 (within allowable 0.003).
 - Both checks pass under design assumptions.
 
@@ -81,12 +82,13 @@ Settlement is calculated per SP 45.133330 clause 5.6:
 
 The reinforced concrete jacket increases the foundation cross-section:
 
+- Existing foundation width: 1.5 m.
 - New jacket dimensions: 150 mm width, 500 mm depth.
 - Concrete class: B15.
 - Reinforcement: A400, diameter 12 mm.
-- Strengthened bearing capacity: 280 kN.
+- Strengthened bearing capacity: 300 kN.
 - Applied load: 220 kN.
-- Safety factor: 1.27 — sufficient.
+- Safety factor: 1.36 — sufficient.
 
 ## Bond Assessment
 
@@ -141,7 +143,7 @@ assumptions made in the absence of project data. The following assumptions
 were used:
 
 - Soil type: medium dense sand (void ratio 0.65).
-- Existing foundation: strip brick, width 0.6 m, embedment 1.5 m.
+- Existing foundation: strip brick, width 1.5 m, embedment 1.5 m.
 - Existing concrete class: B3.5.
 - Design soil resistance: 200 kPa.
 

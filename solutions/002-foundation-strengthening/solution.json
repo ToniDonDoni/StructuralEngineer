@@ -30,7 +30,7 @@
       },
       "existing_foundation_type": {
         "value": "strip_brick",
-        "width_m": 0.6,
+        "width_m": 1.5,
         "embedment_depth_m": 1.5,
         "origin": "design_assumption",
         "status": "conditional_assumption",
@@ -41,6 +41,12 @@
         "origin": "design_assumption",
         "status": "conditional_assumption",
         "scenario_intent": "characteristic for old strip foundations, brick masonry"
+      },
+      "existing_foundation_width_m": {
+        "value": 1.5,
+        "origin": "design_assumption",
+        "status": "conditional_assumption",
+        "scenario_intent": "strip foundation width of old brick house, typical for period construction"
       },
       "design_soil_resistance_kPa": {
         "value": 200,
@@ -81,7 +87,7 @@
       "input_data": {
         "soil_type": "medium_dense_sand",
         "void_ratio": 0.65,
-        "foundation_width_m": 0.6,
+        "foundation_width_m": 1.5,
         "embedment_depth_m": 1.5,
         "water_table_depth_m": 3.0
       },
@@ -94,13 +100,13 @@
       "method": "SP 45.133330 cl. 5.6",
       "input_data": {
         "soil_type": "medium_dense_sand",
-        "foundation_width_m": 0.6,
-        "applied_pressure_kPa": 150,
+        "foundation_width_m": 1.5,
+        "applied_pressure_kPa": 146.7,
         "elastic_modulus_MPa": 15,
         "poisson_ratio": 0.3,
         "layer_thickness_m": 3.0
       },
-      "total_settlement_mm": 45,
+      "total_settlement_mm": 38,
       "angular_distortion": 0.002,
       "allowable_total_mm": 80,
       "allowable_angular": 0.003,
@@ -111,7 +117,7 @@
     "strengthened_foundation": {
       "method": "SP 16.13330 cl. 6.1-6.2",
       "input_data": {
-        "existing_foundation_width_m": 0.6,
+        "existing_foundation_width_m": 1.5,
         "existing_foundation_depth_m": 0.4,
         "new_jacket_width_m": 0.15,
         "new_jacket_depth_m": 0.5,
@@ -120,9 +126,9 @@
         "reinforcement_diameter_mm": 12,
         "reinforcement_area_mm2": 113.1
       },
-      "bearing_capacity_kN": 280,
+      "bearing_capacity_kN": 300,
       "applied_load_kN": 220,
-      "safety_factor": 1.27,
+      "safety_factor": 1.36,
       "result": "bearing_capacity_sufficient",
       "source_clause": "SP 16.13330 cl. 6.1-6.2",
       "note": "Conditional result based on design assumptions."
@@ -131,11 +137,12 @@
       "method": "SP 45.133330 cl. 5.3",
       "input_data": {
         "total_load_kN": 220,
-        "foundation_width_m": 0.6,
+        "foundation_width_m": 1.5,
         "foundation_length_per_m": 1.0,
+        "tributary_area_m2": 1.5,
         "soil_resistance_kPa": 200
       },
-      "pressure_kPa": 150,
+      "pressure_kPa": 146.7,
       "soil_resistance_kPa": 200,
       "result": "pressure_within_resistance",
       "source_clause": "SP 45.133330 cl. 5.3"
