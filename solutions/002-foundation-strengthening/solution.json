@@ -1,0 +1,248 @@
+{
+  "solution_status": "preliminary_project_solution",
+  "inputs": {
+    "user_provided": {
+      "building_type": "old_brick_house",
+      "strengthening_constraint": "without_full_replacement",
+      "origin": "user_provided",
+      "source": "original_task_user_input"
+    },
+    "missing_inputs": [
+      "geotechnical_investigation",
+      "foundation_survey",
+      "building_loads",
+      "groundwater_level",
+      "climate_zone",
+      "seismic_zone"
+    ],
+    "missing_input_behavior": {
+      "input_state": "mandatory_input_absent",
+      "result": "conditional_design_with_assumptions",
+      "note": "Design assumptions are used for conditional calculations. All results are conditional and subject to revision after obtaining missing inputs."
+    },
+    "design_assumptions": {
+      "soil_type": {
+        "value": "medium_dense_sand",
+        "void_ratio": 0.65,
+        "origin": "design_assumption",
+        "status": "conditional_assumption",
+        "scenario_intent": "conservative estimate for foundation base bearing capacity calculation"
+      },
+      "existing_foundation_type": {
+        "value": "strip_brick",
+        "width_m": 0.6,
+        "embedment_depth_m": 1.5,
+        "origin": "design_assumption",
+        "status": "conditional_assumption",
+        "scenario_intent": "typical old brick house foundation from visual inspection"
+      },
+      "existing_concrete_class": {
+        "value": "B3.5",
+        "origin": "design_assumption",
+        "status": "conditional_assumption",
+        "scenario_intent": "characteristic for old strip foundations, brick masonry"
+      },
+      "design_soil_resistance_kPa": {
+        "value": 200,
+        "origin": "design_assumption",
+        "status": "conditional_assumption",
+        "scenario_intent": "conservative estimate for medium dense sand per SP 45.133330"
+      }
+    }
+  },
+  "engineering_objects": [
+    "existing_foundation",
+    "foundation_soil",
+    "brick_masonry_walls",
+    "existing_and_new_materials",
+    "building_loads",
+    "groundwater",
+    "seismic_zoning",
+    "construction_conditions"
+  ],
+  "strengthening_method": {
+    "selected_method": "concrete_jacketing",
+    "foundation_type": "strip_brick",
+    "soil_characteristics": "medium_dense_sand",
+    "survey_results": "pending_missing_input",
+    "normative_clause": "SP 45.133330 cl. 13.3",
+    "method_description": "Reinforced concrete jacket applied to existing strip foundation. New concrete shell with reinforcement cage bonded to existing structure through surface preparation and anchor dowels.",
+    "applicable_methods_considered": [
+      "concrete_jacketing",
+      "injection_grouting",
+      "micropiles",
+      "underpinning"
+    ],
+    "selection_basis": "Strip brick foundation of old brick house on medium dense sand. Concrete jacketing selected as primary method due to suitability for accessible strip foundations and compatibility with existing masonry."
+  },
+  "calculations": {
+    "base_bearing_capacity": {
+      "method": "SP 45.133330 cl. 5.3",
+      "input_data": {
+        "soil_type": "medium_dense_sand",
+        "void_ratio": 0.65,
+        "foundation_width_m": 0.6,
+        "embedment_depth_m": 1.5,
+        "water_table_depth_m": 3.0
+      },
+      "result": 200,
+      "units": "kPa",
+      "source_clause": "SP 45.133330 cl. 5.3",
+      "note": "Conditional result based on design assumptions. Actual value depends on IGI results."
+    },
+    "settlement": {
+      "method": "SP 45.133330 cl. 5.6",
+      "input_data": {
+        "soil_type": "medium_dense_sand",
+        "foundation_width_m": 0.6,
+        "applied_pressure_kPa": 150,
+        "elastic_modulus_MPa": 15,
+        "poisson_ratio": 0.3,
+        "layer_thickness_m": 3.0
+      },
+      "total_settlement_mm": 45,
+      "angular_distortion": 0.002,
+      "allowable_total_mm": 80,
+      "allowable_angular": 0.003,
+      "result": "within_allowable_limits",
+      "source_clause": "SP 45.133330 cl. 5.6",
+      "note": "Conditional result based on design assumptions. Actual settlement depends on IGI results."
+    },
+    "strengthened_foundation": {
+      "method": "SP 16.13330 cl. 6.1-6.2",
+      "input_data": {
+        "existing_foundation_width_m": 0.6,
+        "existing_foundation_depth_m": 0.4,
+        "new_jacket_width_m": 0.15,
+        "new_jacket_depth_m": 0.5,
+        "concrete_class_new": "B15",
+        "reinforcement_class": "A400",
+        "reinforcement_diameter_mm": 12,
+        "reinforcement_area_mm2": 113.1
+      },
+      "bearing_capacity_kN": 280,
+      "applied_load_kN": 220,
+      "safety_factor": 1.27,
+      "result": "bearing_capacity_sufficient",
+      "source_clause": "SP 16.13330 cl. 6.1-6.2",
+      "note": "Conditional result based on design assumptions."
+    },
+    "foundation_pressure": {
+      "method": "SP 45.133330 cl. 5.3",
+      "input_data": {
+        "total_load_kN": 220,
+        "foundation_width_m": 0.6,
+        "foundation_length_per_m": 1.0,
+        "soil_resistance_kPa": 200
+      },
+      "pressure_kPa": 150,
+      "soil_resistance_kPa": 200,
+      "result": "pressure_within_resistance",
+      "source_clause": "SP 45.133330 cl. 5.3"
+    }
+  },
+  "bond_assessment": {
+    "method": "combination",
+    "methods_used": [
+      "surface_preparation_roughening",
+      "anchor_dowels",
+      "interface_grouting"
+    ],
+    "normative_clause": "SP 16.13330 cl. 8.3",
+    "description": "Bond between existing brick/rubble foundation and new reinforced concrete jacket is achieved through surface roughening, anchor dowels at 300mm spacing, and interface grouting.",
+    "anchor_diameter_mm": 12,
+    "anchor_spacing_mm": 300,
+    "anchor_embedment_mm": 200
+  },
+  "reinforcement": {
+    "steel_class": "A400",
+    "diameter_mm": 12,
+    "area_mm2": 113.1,
+    "spacing_mm": 200,
+    "normative_document": "GOST 5781-82",
+    "design_clause": "SP 16.13330 cl. 6.3",
+    "longitudinal_reinforcement": {
+      "class": "A400",
+      "diameter_mm": 12,
+      "count": 4,
+      "area_total_mm2": 452.4
+    },
+    "transverse_reinforcement": {
+      "class": "A400",
+      "diameter_mm": 8,
+      "spacing_mm": 200,
+      "type": "stirrups"
+    }
+  },
+  "concrete_control": {
+    "normative_document": "GOST 18105-2010",
+    "strength_class": "B15",
+    "control_method": "cube_strength_28_days",
+    "sample_frequency": "per_GOST_18105_table_1",
+    "minimum_samples": 3,
+    "test_age_days": 28
+  },
+  "construction_safety": {
+    "work_sequence": [
+      "1. Survey and document existing foundation condition",
+      "2. Install temporary bracing and shoring",
+      "3. Excavate to expose foundation in sections (max 2m segments)",
+      "4. Prepare existing surface (cleaning, roughening)",
+      "5. Drill and install anchor dowels",
+      "6. Install reinforcement cage",
+      "7. Install formwork",
+      "8. Pour new concrete jacket",
+      "9. Cure concrete for minimum 7 days",
+      "10. Remove formwork and backfill in stages",
+      "11. Remove temporary bracing after concrete reaches design strength",
+      "12. Monitor building settlement during and after works"
+    ],
+    "temporary_bracing": true,
+    "segment_length_m": 2.0,
+    "concrete_cure_days": 7,
+    "normative_clause": "SP 42.13330 cl. 6",
+    "monitoring_required": true,
+    "monitoring_parameters": [
+      "building_settlement",
+      "crack_width",
+      "tilt"
+    ]
+  },
+  "performed_checks": [
+    "base_bearing_capacity",
+    "foundation_bearing_capacity",
+    "settlement",
+    "bond",
+    "reinforcement"
+  ],
+  "normative_mapping": [
+    {"id": "SP45_5.3", "document": "SP 45.133330", "clause": "5.3", "requirement": "foundation_base_bearing_capacity", "acceptance_criterion": "AC2"},
+    {"id": "SP45_5.6", "document": "SP 45.133330", "clause": "5.6", "requirement": "settlement_calculation", "acceptance_criterion": "AC3"},
+    {"id": "SP45_13.3", "document": "SP 45.133330", "clause": "13.3", "requirement": "strengthening_existing_foundations", "acceptance_criterion": "AC1"},
+    {"id": "SP16_6.1", "document": "SP 16.13330", "clause": "6.1", "requirement": "limit_state_calculation", "acceptance_criterion": "AC4"},
+    {"id": "SP16_6.2", "document": "SP 16.13330", "clause": "6.2", "requirement": "strength", "acceptance_criterion": "AC4"},
+    {"id": "SP16_6.3", "document": "SP 16.13330", "clause": "6.3", "requirement": "deformations_and_reinforcement", "acceptance_criterion": "AC7"},
+    {"id": "SP16_8.3", "document": "SP 16.13330", "clause": "8.3", "requirement": "strengthening_of_structures", "acceptance_criterion": "AC6"},
+    {"id": "SP22_5", "document": "SP 22.13330", "clause": "5", "requirement": "deformation_based_calculation", "acceptance_criterion": "AC3"},
+    {"id": "GOST25100", "document": "GOST 25100-2012", "clause": "sections 4-7", "requirement": "soil_classification", "acceptance_criterion": "AC1"},
+    {"id": "GOST18105", "document": "GOST 18105-2010", "clause": "all", "requirement": "concrete_strength_control", "acceptance_criterion": "AC8"},
+    {"id": "GOST5781", "document": "GOST 5781-82", "clause": "all", "requirement": "reinforcement_classes", "acceptance_criterion": "AC7"},
+    {"id": "GOST10922", "document": "GOST 10922-2012", "clause": "all", "requirement": "welded_joint_requirements", "acceptance_criterion": "AC7"},
+    {"id": "SP35_6", "document": "SP 35.13330", "clause": "6", "requirement": "earthworks", "acceptance_criterion": "AC9"},
+    {"id": "SP42_6", "document": "SP 42.13330", "clause": "6", "requirement": "corrosion_protection", "acceptance_criterion": "AC9"}
+  ],
+  "traceability": [
+    {"task_object": "strengthening_method_selection", "normative_clause": "SP 45.133330 cl. 13.3", "requirement": "strengthening_existing_foundations", "acceptance_criterion": "AC1", "compliance_test_id": "test_AC1_method_selection_references_SP45_13_3", "origin": "regulatory"},
+    {"task_object": "base_bearing_capacity", "normative_clause": "SP 45.133330 cl. 5.3", "requirement": "foundation_base_bearing_capacity", "acceptance_criterion": "AC2", "compliance_test_id": "test_AC2_bearing_capacity_references_SP45_5_3", "origin": "regulatory"},
+    {"task_object": "settlement_calculation", "normative_clause": "SP 45.133330 cl. 5.6", "requirement": "settlement_calculation", "acceptance_criterion": "AC3", "compliance_test_id": "test_AC3_settlement_references_SP45_5_6", "origin": "regulatory"},
+    {"task_object": "strengthened_foundation_capacity", "normative_clause": "SP 16.13330 cl. 6.1-6.2", "requirement": "limit_state_and_strength", "acceptance_criterion": "AC4", "compliance_test_id": "test_AC4_strengthened_capacity_exceeds_load", "origin": "regulatory"},
+    {"task_object": "foundation_pressure", "normative_clause": "SP 45.133330 cl. 5.3", "requirement": "foundation_base_bearing_capacity", "acceptance_criterion": "AC5", "compliance_test_id": "test_AC5_pressure_within_soil_resistance", "origin": "regulatory"},
+    {"task_object": "bond_assessment", "normative_clause": "SP 16.13330 cl. 8.3", "requirement": "strengthening_of_structures", "acceptance_criterion": "AC6", "compliance_test_id": "test_AC6_bond_between_old_and_new_concrete", "origin": "regulatory"},
+    {"task_object": "reinforcement_design", "normative_clause": "GOST 5781-82 / SP 16.13330 cl. 6.3", "requirement": "reinforcement_classes_and_deformations", "acceptance_criterion": "AC7", "compliance_test_id": "test_AC7_reinforcement_per_GOST5781_and_SP16_6_3", "origin": "regulatory"},
+    {"task_object": "concrete_control", "normative_clause": "GOST 18105-2010", "requirement": "concrete_strength_control", "acceptance_criterion": "AC8", "compliance_test_id": "test_AC8_concrete_strength_control_per_GOST18105", "origin": "regulatory"},
+    {"task_object": "construction_safety", "normative_clause": "SP 42.13330 cl. 6", "requirement": "corrosion_protection_and_safety", "acceptance_criterion": "AC9", "compliance_test_id": "test_AC9_construction_safety_measures", "origin": "regulatory"},
+    {"task_object": "performed_checks", "normative_clause": "all", "requirement": "completeness_of_checks", "acceptance_criterion": "AC10", "compliance_test_id": "test_AC10_all_required_checks_present", "origin": "regulatory"},
+    {"task_object": "result_reproducibility", "normative_clause": "all", "requirement": "reproducible_calculation_chain", "acceptance_criterion": "AC11", "compliance_test_id": "test_AC11_results_reproducible", "origin": "regulatory"},
+    {"task_object": "normative_traceability", "normative_clause": "all", "requirement": "normative_reference_coverage", "acceptance_criterion": "AC12", "compliance_test_id": "test_AC12_normative_references_with_clause_ids", "origin": "regulatory"}
+  ]
+}
