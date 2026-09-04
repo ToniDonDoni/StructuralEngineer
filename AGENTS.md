@@ -2,9 +2,15 @@
 
 This repository follows the unified structural-engineering Spec-Driven TDD workflow defined in:
 
-- `Skills/structural-engineering-spec-driven-tdd/SKILL.md`
+- `skills/structural-engineering-spec-driven-tdd/SKILL.md`
 
 Before changing this repository, the implementer must read and follow that skill.
+
+Repository layout:
+
+- `skills/` contains agent workflow skills.
+- `tasks/<NNN-short-task-name>/` contains task input and specification files, including raw user input in `TASK.md` and the approved `SPEC.md`.
+- `solutions/<NNN-short-task-name>/` contains the solution for the corresponding task, including RED and GREEN stage artifacts and results.
 
 Required workflow:
 

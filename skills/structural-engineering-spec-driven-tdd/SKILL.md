@@ -3,7 +3,7 @@ name: structural-engineering-spec-driven-tdd
 description: "Spec-Driven Test-Driven Development framework for structural and construction engineering tasks under Russian construction regulations: human-approved spec, independently reviewed RED and GREEN."
 license: MIT
 metadata:
-  version: 1.2.2
+  version: 1.2.3
   author: GPT-5.6 Sol
 ---
 
@@ -22,8 +22,8 @@ The user gives the engineering task in chat, for example:
 If no task directory exists yet, the Implementer:
 
 1. determines the next task number;
-2. creates `Tasks/<NNN-short-task-name>/` using a concise task name derived from the user request;
-3. writes the user's raw task input to `Tasks/<NNN-short-task-name>/TASK.md`;
+2. creates `tasks/<NNN-short-task-name>/` using a concise task name derived from the user request;
+3. writes the user's raw task input to `tasks/<NNN-short-task-name>/TASK.md`;
 4. uses that `TASK.md` as the source input for Spec formation.
 
 ### 2. `TASK.md` already exists
@@ -34,17 +34,17 @@ In that case, the Implementer uses the existing task directory and existing `TAS
 
 Example:
 
-`Use structural-engineering-spec-driven-tdd skill. Work from Tasks/002-foundation-strengthening/TASK.md according to the skill.`
+`Use structural-engineering-spec-driven-tdd skill. Work from tasks/002-foundation-strengthening/TASK.md according to the skill.`
 
 `TASK.md` contains the raw, unapproved user input. The Implementer reads it, forms the approval-ready engineering spec, and shows that spec to the user.
 
-After explicit user approval, the Implementer persists the approved version in the same task directory as `spec.md`.
+After explicit user approval, the Implementer persists the approved version in the same task directory as `SPEC.md`.
 
 Only then does RED begin.
 
 The task flow is:
 
-`User Input -> TASK.md -> Approval-ready Spec -> User Approval -> spec.md -> RED -> RED_REVIEW -> GREEN -> GREEN_REVIEW`
+`User Input -> TASK.md -> Approval-ready Spec -> User Approval -> SPEC.md -> RED -> RED_REVIEW -> GREEN -> GREEN_REVIEW`
 
 # Structural Engineering Spec-Driven TDD
 
@@ -58,7 +58,7 @@ For engineering tasks, the spec establishes what must be true. RED defines how e
 2. **Implementer** ensures the task has a task-local `TASK.md`: create the next numbered task directory and `TASK.md` from direct user input when needed, or reuse the existing task directory when already present.
 3. **Implementer** reads `TASK.md`, analyzes the task, identifies engineering objects, finds the applicable Russian normative basis, identifies required inputs and assumptions, and produces a compact approval-ready spec with a complete acceptance-criteria list.
 4. **User** explicitly approves the spec.
-5. **Implementer** persists the approved spec as task-local `spec.md` and commits it.
+5. **Implementer** persists the approved spec as task-local `SPEC.md` and commits it.
 6. **Implementer** writes RED tests covering every approved acceptance criterion and proves they fail for the intended reason.
 7. **Reviewer**, running independently from the Implementer, performs `RED_REVIEW`.
 8. On `RED_REVIEW: FAIL`, the Implementer fixes RED, reruns it, commits, and requests independent review again until `RED_REVIEW: PASS`.
@@ -223,9 +223,9 @@ The approval-ready spec must contain exactly the information needed to agree on 
 
 The approval-ready spec is shown to the user before it becomes canonical.
 
-After explicit user approval, persist the canonical approved spec in the same task directory as `spec.md`.
+After explicit user approval, persist the canonical approved spec in the same task directory as `SPEC.md`.
 
-Commit `spec.md` with an ASCII-only commit message before RED.
+Commit `SPEC.md` with an ASCII-only commit message before RED.
 
 There is no `SPEC_REVIEW` stage.
 
@@ -237,11 +237,11 @@ Append the new raw user requirement to task-local `TASK.md` as:
 
 `ADDITION: <requirement>`
 
-Identify affected objects/norms/inputs/ACs, update the approval-ready spec, and replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived. After approval, update the canonical `spec.md` before continuing affected RED/GREEN work.
+Identify affected objects/norms/inputs/ACs, update the approval-ready spec, and replan only the affected RED/GREEN work. Obtain renewed user approval unless further approval was explicitly waived. After approval, update the canonical `SPEC.md` before continuing affected RED/GREEN work.
 
 ## RED
 
-After user approval and persistence of `spec.md`, the Implementer defines the proving tests.
+After user approval and persistence of `SPEC.md`, the Implementer defines the proving tests.
 
 **Every acceptance criterion in the approved spec must have identifiable RED proving coverage.**
 
@@ -277,7 +277,7 @@ Run the narrow proving command and commit RED with an ASCII-only commit message.
 The independent Reviewer reads:
 
 1. the original user task from `TASK.md`;
-2. the approved `spec.md` and complete `AC1...ACN` list;
+2. the approved `SPEC.md` and complete `AC1...ACN` list;
 3. the RED commits/tests;
 4. proving evidence.
 
@@ -337,7 +337,7 @@ Run proving tests and relevant regression tests, then commit with an ASCII-only 
 
 ### GREEN_REVIEW — Reviewer agent
 
-The independent Reviewer reads `TASK.md`, approved `spec.md`, complete AC list, reviewed RED, GREEN commits, and engineering result.
+The independent Reviewer reads `TASK.md`, approved `SPEC.md`, complete AC list, reviewed RED, GREEN commits, and engineering result.
 
 The Reviewer checks that:
 
